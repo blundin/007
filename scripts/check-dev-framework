@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Gates for the dev framework (agent hooks), kept apart from the project's
+# ./scripts/check. The hooks are Python whatever the project's language, so
+# their tools run through uv with pinned versions, no project environment,
+# and config files of their own under .claude/hooks/.
+set -euo pipefail
+
+TOOLS=(--no-project --with ruff==0.16.9 --with mypy==2.3.1 --with pytest==9.1.1)
+
+uv run "${TOOLS[@]}" ruff check .claude/hooks
+uv run "${TOOLS[@]}" ruff format --check .claude/hooks
+uv run "${TOOLS[@]}" mypy --config-file .claude/hooks/mypy.ini .claude/hooks
+uv run "${TOOLS[@]}" pytest -c .claude/hooks/pytest.ini -p no:cacheprovider \
+  .claude/hooks/tests "$@"

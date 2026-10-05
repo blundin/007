@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git add:*)",
+      "Bash(git switch:*)",
+      "Bash(git restore:*)",
+      "Bash(./scripts/check:*)",
+      "Bash(./scripts/test:*)",
+      "Bash(./scripts/lint:*)",
+      "Bash(./scripts/check-dev-framework:*)"
+    ],
+    "ask": [
+      "Bash(git commit:*)",
+      "Bash(git reset:*)",
+      "Bash(git push:*)",
+      "Bash(gh pr:*)"
+    ]
+  }
+}

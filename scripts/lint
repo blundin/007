@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Lints, format-checks, and type-checks the named files. Usage: ./scripts/lint <paths>
+# Replace this body with your project's commands. See README.md, Adopting.
+set -euo pipefail
+
+echo "scripts/lint is not configured. See README.md, Adopting." >&2
+exit 1
