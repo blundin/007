@@ -18,26 +18,25 @@ follow the printed steps to configure it.
 
 ## What it copies
 
-`bin/007` copies a fixed list of paths from its own checkout. The list lives
-in the script. 007's own files (`bin/`, its README, its backlog, lessons,
-ADRs, and specs) are not on it.
+`bin/007` copies every file git tracks under `framework/` in its own
+checkout, keeping its path relative to `framework/`. Untracked and ignored
+files, such as Python caches, are not copied. Nothing outside `framework/`
+is copied: not `bin/`, `tests/`, the root scripts, or 007's own docs.
 
-| Path | Notes |
-|---|---|
-| `CLAUDE.md`, `AGENTS.md`, `.gitignore` | |
-| `.claude/agents/`, `.claude/hooks/` (with its tests and configs), `.claude/skills/review-tracker/` | Python cache folders excluded |
-| `.claude/lanes.json`, `.claude/settings.json` | |
-| `scripts/check`, `scripts/test`, `scripts/lint`, `scripts/check-dev-framework` | Copied executable |
-| `docs/specs/README.md`, `docs/plans/README.md`, `docs/code-reviews/README.md`, `docs/dev-framework/README.md` | |
+`framework/` holds `CLAUDE.md`, `AGENTS.md`, `.gitignore`, `.claude/` (agents,
+hooks with their tests and configs, the review-tracker skill, `lanes.json`,
+`settings.json`), `scripts/` (`check`, `test`, `lint`,
+`check-dev-framework`, copied executable), and the READMEs for `docs/specs/`,
+`docs/plans/`, and `docs/code-reviews/`.
 
 ## Criteria
 
 - **NEW-01**: `007 new <dir>` creates `<dir>`, runs `git init` in it, and
-  copies every listed path. Each file's contents match 007's checkout, and
+  copies every framework file. Each file's contents match 007's checkout, and
   scripts keep their executable bit.
 - **NEW-02**: `007 new <dir>` exits non-zero and writes nothing if `<dir>`
   already exists.
-- **INIT-01**: `007 init` copies every listed path into the current
+- **INIT-01**: `007 init` copies every framework file into the current
   directory. It exits non-zero and writes nothing if the current directory is
   not the top level of a git repo.
 - **INIT-02**: `007 init` never overwrites an existing file. It lists every
@@ -63,8 +62,8 @@ target), or a half-finished copy after an error.
 - `bin/007`: one Python 3 file, standard library only, as with the hooks.
 - Framework work, done by the main session with Brian and test-first with
   pytest. The triad isn't used.
-- Its tests live in 007 only, with their own gate (`scripts/check-tool`),
-  which is not copied to projects.
+- Its tests live in `tests/`, outside `framework/`, and run in 007's root
+  gate, `scripts/check`, which is not copied to projects.
 
 ## Later, if needed
 
