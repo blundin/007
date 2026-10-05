@@ -27,9 +27,9 @@ commit history, and the checkpoint doc.
 ### FW-06 Process agent
 
 An agent that works this backlog: records lessons, writes framework specs,
-and proposes changes for human approval. Lane: `.claude/agents/`, the loop
-rules in `CLAUDE.md`, and `docs/dev-framework/`. Never `.claude/hooks/` or
-settings. When it's built, FW-10 dispatches it.
+and proposes changes for human approval. Lane: `framework/.claude/agents/`,
+the loop rules in `framework/CLAUDE.md`, and 007's `docs/`. Never
+`framework/.claude/hooks/` or settings. When it's built, FW-10 dispatches it.
 
 ### FW-02 Engineering manager, phase 2: parallel triads
 

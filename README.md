@@ -1,4 +1,4 @@
-# 007: Adversarial TDD Loop template
+# 007: the Adversarial TDD Loop framework
 
 A Claude Code project template that builds software from specs with a team of
 agents that check each other's work. A test engineer tries to prove the code
@@ -35,8 +35,16 @@ profile).
 
 ## Adopting
 
-1. **Copy the template.** On GitHub, use "Use this template". Locally, copy
-   the folder and run `git init`.
+1. **Copy the framework** with `bin/007`, from a clone of this repo:
+
+       git clone git@github.com:TheAustinStone/007.git ~/tools/007
+       ~/tools/007/bin/007 new myapp    # new directory, git init, copy
+       ~/tools/007/bin/007 init         # into the current repo, from its top level
+
+   It never overwrites a file. Anything that already exists is skipped and
+   listed. For `CLAUDE.md`, `AGENTS.md`, `.claude/settings.json`, and
+   `.gitignore`, it names the file to merge by hand. It records the 007
+   commit it copied from in `.007-version`.
 2. **Set the lanes.** Edit `.claude/lanes.json` so `src` and `test` list the
    path prefixes each lane may write, each ending in `/`. A Rails app might
    use `{"test": ["spec/"], "src": ["app/", "lib/"]}`.
@@ -64,6 +72,17 @@ profile).
 
 | Path | Contents |
 |---|---|
+| `framework/` | Everything that lands in a project. `bin/007` copies every tracked file in it, so adding a file here ships it |
+| `bin/007` | The copy command |
+| `tests/` | The copy command's tests |
+| `scripts/check` | 007's single gate: the copy command's checks, then the framework's hook checks |
+| `docs/` | 007's own backlog, lessons, decision records, and specs. Never copied |
+| `CHANGELOG.md` | What changed in the framework, by version |
+
+Inside `framework/`:
+
+| Path | Contents |
+|---|---|
 | `CLAUDE.md` | The Adversarial TDD Loop: roles, phases, diff check, triage, done criteria |
 | `AGENTS.md` | Rules for every contributor, and the Project profile |
 | `.claude/agents/` | The five agent definitions |
@@ -73,7 +92,17 @@ profile).
 | `.claude/skills/review-tracker/` | Records findings in `docs/code-reviews/` |
 | `scripts/` | `check`, `test`, `lint` (yours to fill in), and `check-dev-framework` |
 | `docs/specs/`, `docs/plans/`, `docs/code-reviews/` | Specs, scope plans, findings |
-| `docs/dev-framework/` | The framework's own backlog and lessons |
+
+## Changing the framework
+
+1. Change files under `framework/` on a branch. Framework changes follow the
+   rules in [`docs/README.md`](docs/README.md).
+2. Run `./scripts/check`.
+3. Add an entry under `Unreleased` in `CHANGELOG.md` for anything an adopter
+   would notice.
+4. To release, move the `Unreleased` entries under a new version heading and
+   tag it (`git tag v0.2.0`). `git diff v0.1.0..v0.2.0 -- framework/` shows
+   adopters exactly what changed.
 
 ## Provenance
 
