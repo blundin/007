@@ -5,6 +5,8 @@ Changes to `framework/` that an adopter would notice. Versions are git tags;
 
 ## Unreleased
 
+## v0.1.0 (2026-10-05)
+
 - Added `bin/007 new` and `bin/007 init`, which copy the framework into a
   new or existing repo.
 - Moved the framework into `framework/`. Adopters get the same files.
