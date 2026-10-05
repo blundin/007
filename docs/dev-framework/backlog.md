@@ -41,3 +41,11 @@ Known blocker: `lane_guard.py` resolves paths against `$CLAUDE_PROJECT_DIR`
 and blocks anything outside it, so a triad writing in a separate worktree
 would be blocked or checked against the wrong tree. Hook changes are the
 human's to make.
+
+### FW-11 007 bootstrap tool
+
+`bin/007`, a small copy command like `rails new`: `007 new <dir>` and
+`007 init`. Copies the framework files, never overwrites, records
+`.007-version`, and prints the setup steps. Decided in
+[ADR-001](adr/ADR-001-007-tool.md) (Amendment 2); spec in
+[`specs/FW-11-007-tool.md`](specs/FW-11-007-tool.md), awaiting approval.
