@@ -1,0 +1,151 @@
+#!/usr/bin/env python3
+"""Copy the framework into a new project or an existing repo.
+
+    007 new <dir>   create <dir>, run git init, and copy the framework
+    007 init        copy the framework into the current repo
+
+Existing files are never overwritten. Nothing is committed.
+"""
+
+import argparse
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+CHECKOUT = Path(__file__).resolve().parent.parent
+
+LISTED_PATHS = [
+    "CLAUDE.md",
+    "AGENTS.md",
+    ".gitignore",
+    ".claude/agents",
+    ".claude/hooks",
+    ".claude/skills/review-tracker",
+    ".claude/lanes.json",
+    ".claude/settings.json",
+    "scripts/check",
+    "scripts/test",
+    "scripts/lint",
+    "scripts/check-dev-framework",
+    "docs/specs/README.md",
+    "docs/plans/README.md",
+    "docs/code-reviews/README.md",
+    "docs/dev-framework/README.md",
+]
+
+MERGE_BY_HAND = {"CLAUDE.md", "AGENTS.md", ".claude/settings.json", ".gitignore"}
+
+VERSION_FILE = ".007-version"
+
+NEXT_STEPS = """
+Next steps:
+  1. Set the src and test lanes in .claude/lanes.json.
+  2. Fill in every FILL marker: grep -rn FILL AGENTS.md
+  3. Write scripts/check, scripts/test, and scripts/lint for your stack.
+  4. Run ./scripts/check-dev-framework.
+  5. Review the changes and commit them.
+"""
+
+
+class RefusedError(Exception):
+    pass
+
+
+def git(cwd: Path, *args: str) -> str:
+    result = subprocess.run(
+        ["git", *args], cwd=cwd, capture_output=True, text=True, check=False
+    )
+    if result.returncode != 0:
+        raise RefusedError(f"git {' '.join(args)} failed: {result.stderr.strip()}")
+    return result.stdout
+
+
+def framework_files() -> list[str]:
+    tracked = git(CHECKOUT, "ls-files", "-z", "--", *LISTED_PATHS)
+    return sorted(path for path in tracked.split("\0") if path)
+
+
+def plan_copy(target: Path, files: list[str]) -> tuple[list[str], list[str]]:
+    root = target.resolve()
+    to_copy: list[str] = []
+    skipped: list[str] = []
+    for relative in files:
+        destination = target / relative
+        if not destination.resolve().is_relative_to(root):
+            raise RefusedError(f"{relative} leads outside {root}; nothing written")
+        if destination.is_symlink() or destination.exists():
+            skipped.append(relative)
+        else:
+            to_copy.append(relative)
+    return to_copy, skipped
+
+
+def copy_framework(target: Path) -> None:
+    commit = git(CHECKOUT, "rev-parse", "HEAD").strip()
+    to_copy, skipped = plan_copy(target, [*framework_files(), VERSION_FILE])
+    for relative in to_copy:
+        destination = target / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        if relative == VERSION_FILE:
+            destination.write_text(commit + "\n")
+        else:
+            shutil.copy2(CHECKOUT / relative, destination)
+    report(to_copy, skipped)
+
+
+def report(copied: list[str], skipped: list[str]) -> None:
+    print(f"Copied {len(copied)} files.")
+    if skipped:
+        print("Skipped, because they already exist:")
+        for relative in skipped:
+            if relative in MERGE_BY_HAND:
+                hint = f" (merge in {CHECKOUT / relative} by hand)"
+            else:
+                hint = ""
+            print(f"  {relative}{hint}")
+    print(NEXT_STEPS, end="")
+
+
+def new(directory: str) -> None:
+    target = Path(directory)
+    if target.exists() or target.is_symlink():
+        raise RefusedError(f"{target} already exists")
+    target.mkdir(parents=True)
+    git(target, "init", "-q")
+    copy_framework(target)
+
+
+def init() -> None:
+    target = Path.cwd()
+    try:
+        top_level = Path(git(target, "rev-parse", "--show-toplevel").strip())
+    except RefusedError:
+        raise RefusedError(f"{target} is not in a git repo") from None
+    if top_level.resolve() != target.resolve():
+        raise RefusedError(f"run 007 init from the top level of the repo: {top_level}")
+    copy_framework(target)
+
+
+def main(argv: list[str]) -> int:
+    parser = argparse.ArgumentParser(
+        prog="007", description="Copy the framework into a project."
+    )
+    commands = parser.add_subparsers(dest="command", required=True)
+    new_parser = commands.add_parser("new", help="create a new project")
+    new_parser.add_argument("directory")
+    commands.add_parser("init", help="add the framework to the current repo")
+    args = parser.parse_args(argv)
+    try:
+        if args.command == "new":
+            new(args.directory)
+        else:
+            init()
+    except RefusedError as error:
+        print(f"007: {error}", file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))
