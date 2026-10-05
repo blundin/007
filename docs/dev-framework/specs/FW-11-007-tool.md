@@ -1,7 +1,6 @@
 # FW-11: 007, the bootstrap tool
 
-Status: draft, awaiting Brian's approval. Agents treat this spec as binding
-only after the status says approved.
+Status: Approved.
 
 Decision record: [ADR-001](../adr/ADR-001-007-tool.md), as amended
 (simplified to a copy command).
