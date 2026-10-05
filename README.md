@@ -35,11 +35,21 @@ profile).
 
 ## Adopting
 
-1. **Copy the framework** with `bin/007`, from a clone of this repo:
+1. **Copy the framework** with `bin/007`. Install it once by cloning this
+   repo and linking the command onto your `PATH`:
 
        git clone git@github.com:TheAustinStone/007.git ~/tools/007
-       ~/tools/007/bin/007 new myapp    # new directory, git init, copy
-       ~/tools/007/bin/007 init         # into the current repo, from its top level
+       ln -s ~/tools/007/bin/007 ~/.local/bin/007
+
+   Then, for each project:
+
+       007 new myapp    # new directory, git init, copy
+       007 init         # into the current repo, from its top level
+
+   The clone is the installed version. To pin a release, check out its tag
+   (`git -C ~/tools/007 checkout v0.1.0`); to upgrade, pull or check out a
+   newer tag, and read `CHANGELOG.md` for what changed. Copy from a clean
+   checkout, since `.007-version` records the commit, not local edits.
 
    It never overwrites a file. Anything that already exists is skipped and
    listed. For `CLAUDE.md`, `AGENTS.md`, `.claude/settings.json`, and
