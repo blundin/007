@@ -1,7 +1,17 @@
 #!/usr/bin/env bash
-# The full gate the TDD loop treats as GREEN: lint, format, strict types, every test, and coverage. Extra arguments pass through to the test runner.
-# Replace this body with your project's commands. See README.md, Adopting.
+# 007's single gate: the bootstrap tool (bin/007 and tests/), then the
+# framework's own hook checks, run inside framework/ as a project would.
+# Reuses the hooks' pinned tools and config files.
 set -euo pipefail
 
-echo "scripts/check is not configured. See README.md, Adopting." >&2
-exit 1
+cd "$(dirname "$0")/.."
+
+TOOLS=(--no-project --with ruff==0.16.9 --with mypy==2.3.1 --with pytest==9.1.1)
+HOOKS=framework/.claude/hooks
+
+uv run "${TOOLS[@]}" ruff check --config "$HOOKS/ruff.toml" bin/007 tests
+uv run "${TOOLS[@]}" ruff format --check --config "$HOOKS/ruff.toml" bin/007 tests
+uv run "${TOOLS[@]}" mypy --config-file "$HOOKS/mypy.ini" bin/007 tests
+uv run "${TOOLS[@]}" pytest -c "$HOOKS/pytest.ini" -p no:cacheprovider tests "$@"
+
+(cd framework && ./scripts/check-dev-framework)

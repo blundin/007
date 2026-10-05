@@ -15,24 +15,7 @@ from pathlib import Path
 
 CHECKOUT = Path(__file__).resolve().parent.parent
 
-LISTED_PATHS = [
-    "CLAUDE.md",
-    "AGENTS.md",
-    ".gitignore",
-    ".claude/agents",
-    ".claude/hooks",
-    ".claude/skills/review-tracker",
-    ".claude/lanes.json",
-    ".claude/settings.json",
-    "scripts/check",
-    "scripts/test",
-    "scripts/lint",
-    "scripts/check-dev-framework",
-    "docs/specs/README.md",
-    "docs/plans/README.md",
-    "docs/code-reviews/README.md",
-    "docs/dev-framework/README.md",
-]
+FRAMEWORK = CHECKOUT / "framework"
 
 MERGE_BY_HAND = {"CLAUDE.md", "AGENTS.md", ".claude/settings.json", ".gitignore"}
 
@@ -62,7 +45,7 @@ def git(cwd: Path, *args: str) -> str:
 
 
 def framework_files() -> list[str]:
-    tracked = git(CHECKOUT, "ls-files", "-z", "--", *LISTED_PATHS)
+    tracked = git(FRAMEWORK, "ls-files", "-z")
     return sorted(path for path in tracked.split("\0") if path)
 
 
@@ -90,7 +73,7 @@ def copy_framework(target: Path) -> None:
         if relative == VERSION_FILE:
             destination.write_text(commit + "\n")
         else:
-            shutil.copy2(CHECKOUT / relative, destination)
+            shutil.copy2(FRAMEWORK / relative, destination)
     report(to_copy, skipped)
 
 
@@ -100,7 +83,7 @@ def report(copied: list[str], skipped: list[str]) -> None:
         print("Skipped, because they already exist:")
         for relative in skipped:
             if relative in MERGE_BY_HAND:
-                hint = f" (merge in {CHECKOUT / relative} by hand)"
+                hint = f" (merge in {FRAMEWORK / relative} by hand)"
             else:
                 hint = ""
             print(f"  {relative}{hint}")

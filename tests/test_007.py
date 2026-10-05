@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-TOOL = Path(__file__).resolve().parent.parent / "007"
+TOOL = Path(__file__).resolve().parent.parent / "bin" / "007"
 
 GIT_ENV = {
     **os.environ,
@@ -18,7 +18,7 @@ GIT_ENV = {
     "GIT_COMMITTER_EMAIL": "test@example.com",
 }
 
-LISTED_FILES = {
+FRAMEWORK_FILES = {
     "CLAUDE.md": "@AGENTS.md\nloop rules\n",
     "AGENTS.md": "# <!-- FILL: project name -->\n",
     ".gitignore": "__pycache__/\n",
@@ -37,15 +37,20 @@ LISTED_FILES = {
     "docs/specs/README.md": "specs\n",
     "docs/plans/README.md": "plans\n",
     "docs/code-reviews/README.md": "code reviews\n",
-    "docs/dev-framework/README.md": "dev framework\n",
+    "docs/guides/added-later.md": "a file no list names\n",
 }
 
-UNLISTED_FILES = {
+OUTSIDE_FILES = {
     "README.md": "007 readme\n",
-    "docs/dev-framework/backlog.md": "backlog\n",
-    "docs/dev-framework/lessons.md": "lessons\n",
-    "docs/dev-framework/specs/FW-11-007-tool.md": "spec\n",
-    "docs/dev-framework/adr/ADR-001-007-tool.md": "adr\n",
+    "CLAUDE.md": "how to work on 007\n",
+    "CHANGELOG.md": "changes\n",
+    "scripts/check": "#!/usr/bin/env bash\n# 007's own gate\n",
+    "tests/test_007.py": "# tool tests\n",
+    "docs/README.md": "007 docs\n",
+    "docs/backlog.md": "backlog\n",
+    "docs/lessons.md": "lessons\n",
+    "docs/specs/FW-11-007-tool.md": "spec\n",
+    "docs/adr/ADR-001-007-tool.md": "adr\n",
 }
 
 SCRIPTS = [
@@ -84,16 +89,16 @@ def write_files(root: Path, files: dict[str, str]) -> None:
 @pytest.fixture
 def checkout(tmp_path: Path) -> Path:
     root = tmp_path / "007"
-    write_files(root, LISTED_FILES)
-    write_files(root, UNLISTED_FILES)
+    write_files(root / "framework", FRAMEWORK_FILES)
+    write_files(root, OUTSIDE_FILES)
     for script in SCRIPTS:
-        (root / script).chmod(0o755)
+        (root / "framework" / script).chmod(0o755)
     (root / "bin").mkdir()
     shutil.copy2(TOOL, root / "bin" / "007")
     git(root, "init", "-q")
     git(root, "add", "-A")
     git(root, "commit", "-q", "-m", "fake 007")
-    cache = root / ".claude" / "hooks" / "tests" / "__pycache__"
+    cache = root / "framework" / ".claude" / "hooks" / "tests" / "__pycache__"
     cache.mkdir()
     (cache / "test_lane_guard.cpython-313.pyc").write_bytes(b"\x00")
     return root
@@ -136,14 +141,14 @@ def all_files(root: Path) -> set[str]:
 # NEW-01
 
 
-def test_new_copies_every_listed_file_with_matching_contents(
+def test_new_copies_every_framework_file_with_matching_contents(
     checkout: Path, tmp_path: Path
 ) -> None:
     result = run_007(checkout, tmp_path, "new", "myapp")
 
     assert result.returncode == 0, result.stderr
     target = tmp_path / "myapp"
-    for relative, content in LISTED_FILES.items():
+    for relative, content in FRAMEWORK_FILES.items():
         assert (target / relative).read_text() == content, relative
 
 
@@ -164,12 +169,12 @@ def test_new_keeps_scripts_executable(checkout: Path, tmp_path: Path) -> None:
         assert os.access(tmp_path / "myapp" / script, os.X_OK), script
 
 
-def test_new_copies_only_listed_files_and_the_version_file(
+def test_new_copies_only_framework_files_and_the_version_file(
     checkout: Path, tmp_path: Path
 ) -> None:
     run_007(checkout, tmp_path, "new", "myapp")
 
-    assert all_files(tmp_path / "myapp") == {*LISTED_FILES, ".007-version"}
+    assert all_files(tmp_path / "myapp") == {*FRAMEWORK_FILES, ".007-version"}
 
 
 # NEW-02
@@ -198,13 +203,13 @@ def test_new_refuses_an_existing_file(checkout: Path, tmp_path: Path) -> None:
 # INIT-01
 
 
-def test_init_copies_every_listed_file_into_the_repo(
+def test_init_copies_every_framework_file_into_the_repo(
     checkout: Path, repo: Path
 ) -> None:
     result = run_007(checkout, repo, "init")
 
     assert result.returncode == 0, result.stderr
-    for relative, content in LISTED_FILES.items():
+    for relative, content in FRAMEWORK_FILES.items():
         assert (repo / relative).read_text() == content, relative
     for script in SCRIPTS:
         assert os.access(repo / script, os.X_OK), script
@@ -255,7 +260,7 @@ def test_init_says_what_to_merge_by_hand_for_a_skipped_shared_file(
     result = run_007(checkout, repo, "init")
 
     assert (repo / relative).read_text() == "the project's own\n"
-    assert str(checkout / relative) in result.stdout
+    assert str(checkout / "framework" / relative) in result.stdout
 
 
 def test_init_does_not_overwrite_an_existing_version_file(
