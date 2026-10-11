@@ -1,4 +1,4 @@
-# 007: the Adversarial TDD Loop framework
+# 007: The Agentic Deveopment Framework
 
 A Claude Code project template that builds software from specs with a team of agents that check each other's work. A test engineer tries to prove the code fails its spec, a developer writes the minimum code that passes, and a refactorer cleans up with tests locked. Each one is held to its own folder by hooks, and the coordinator verifies every phase before it commits.
 
