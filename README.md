@@ -95,13 +95,13 @@ Inside `framework/`:
 |---|---|
 | `CLAUDE.md` | The Adversarial TDD Loop: roles, phases, diff check, triage, done criteria |
 | `AGENTS.md` | Rules for every contributor, and the Project profile |
-| `.claude/agents/` | The five agent definitions |
-| `.claude/hooks/` | `lane_guard.py`, `git_guard.py`, and their tests |
+| `.claude/agents/` | The seven agent definitions: the five loop agents, plus `architect` and `reviewer`, which run outside the loop |
+| `.claude/hooks/` | `lane_guard.py`, `git_guard.py`, `adr_write_guard.py`, and their tests |
 | `.claude/lanes.json` | Lane paths |
 | `.claude/settings.json` | Permissions |
 | `.claude/skills/review-tracker/` | Records findings in `docs/code-reviews/` |
 | `scripts/` | `check`, `test`, `lint` (yours to fill in), and `check-dev-framework` |
-| `docs/specs/`, `docs/plans/`, `docs/code-reviews/` | Specs, scope plans, findings |
+| `docs/specs/`, `docs/plans/`, `docs/code-reviews/`, `docs/adr/` | Specs, scope plans, findings, decision records |
 
 ## Changing the framework
 

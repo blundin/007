@@ -5,6 +5,15 @@ Changes to `framework/` that an adopter would notice. Versions are git tags;
 
 ## Unreleased
 
+- Added the `architect` agent. It recommends one option and records ADRs in
+  `docs/adr/`. The new `adr_write_guard.py` hook limits it to Markdown files
+  there.
+- Added the `reviewer` agent, an independent code reviewer that records
+  findings through the `review-tracker` skill.
+- Neither agent is part of the loop in `CLAUDE.md`; the main session or the
+  human dispatches them.
+- Added `docs/adr/README.md`.
+
 ## v0.1.0 (2026-10-05)
 
 - Added `bin/007 new` and `bin/007 init`, which copy the framework into a
