@@ -6,9 +6,9 @@ Decision record: [ADR-001](../adr/ADR-001-007-tool.md), as amended (simplified t
 
 ## Goal
 
-Like `rails new`, but small. A developer at Austin Stone can put the framework into a new project or an existing repo with one command, then follow the printed steps to configure it. One more command takes it out again.
+Like `rails new`, but small. A developer can put the framework into a new project or an existing repo with one command, then follow the printed steps to configure it. One more command takes it out again.
 
-    git clone git@github.com:TheAustinStone/007.git ~/tools/007
+    git clone https://github.com/blundin/007.git ~/tools/007
 
     ~/tools/007/bin/007 new myapp    # new directory, git init, copy the framework
     ~/tools/007/bin/007 init         # copy the framework into the current repo

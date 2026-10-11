@@ -2,7 +2,7 @@
 
 Status: `todo`, `doing`, `done`, `dropped`. Newest decisions are recorded in the item. Done items stay, so the history is visible. Within each section, order is priority.
 
-IDs continue from Snakestone, where the framework was first built, so lessons and history trace back to their source.
+IDs continue from the project where the framework was first built, so lessons and history trace back to their source.
 
 ## Todo
 

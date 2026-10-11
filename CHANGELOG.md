@@ -21,4 +21,4 @@ Changes to `framework/` that an adopter would notice. Versions are git tags; `gi
 
 ## Baseline
 
-Extracted from Snakestone at `319e93c`.
+Extracted from the framework's first project at `319e93c`.

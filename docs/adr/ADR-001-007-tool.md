@@ -6,7 +6,7 @@ The tool is named **007**, after the template repo. It installs, configures and 
 
 ## Context
 
-`007` was extracted from Snakestone at `319e93c`. Today a project adopts it by hand, following the eight steps in `README.md`, and lessons move between projects by hand too (README, Provenance). We want a tool that can:
+`007` was extracted from the framework's first project at `319e93c`. Today a project adopts it by hand, following the eight steps in `README.md`, and lessons move between projects by hand too (README, Provenance). We want a tool that can:
 
 1. **Bootstrap** a new, empty project into the framework.
 2. **Apply** the framework to an existing repo.
@@ -150,7 +150,7 @@ The second deciding factor is the **plugin hook limitation**. Until plugin agent
   - template releases need git tags.
 - **To revisit:**
   - moving agents and skills to a plugin once per-agent hooks work in plugin agents;
-  - whether Snakestone itself should be linked with `copier copy` onto its existing tree;
+  - whether that first project itself should be linked with `copier copy` onto its existing tree;
   - FW-02 (worktrees) interacts with `$CLAUDE_PROJECT_DIR` in the hooks either way.
 
 ## Decisions from Brian (2026-10-05)

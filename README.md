@@ -31,7 +31,7 @@ Every batch goes RED, GREEN, REFACTOR, with a checkpoint commit after each phase
 
    **For one project**, clone, copy, and delete the clone. Run `init` from the project's top level:
 
-       git clone git@github.com:TheAustinStone/007.git /tmp/007
+       git clone https://github.com/blundin/007.git /tmp/007
        /tmp/007/bin/007 init
        rm -rf /tmp/007
 
@@ -39,7 +39,7 @@ Every batch goes RED, GREEN, REFACTOR, with a checkpoint commit after each phase
 
    **For many projects**, keep the clone and link the command onto your `PATH`:
 
-       git clone git@github.com:TheAustinStone/007.git ~/tools/007
+       git clone https://github.com/blundin/007.git ~/tools/007
        ln -s ~/tools/007/bin/007 ~/.local/bin/007
 
    Then, for each project:
@@ -98,6 +98,6 @@ Inside `framework/`:
 
 ## Provenance
 
-- Extracted from Snakestone (`TheAustinStone/snakestone`) at `319e93c`, following its spec `docs/dev-framework/specs/FW-08-extract-framework.md`.
+- Extracted from the framework's first project at `319e93c`, following its spec `docs/dev-framework/specs/FW-08-extract-framework.md`.
 - `review-tracker` is vendored from `blundin/code-review-issue-tracker` at `03fc0be` (MIT). If you also have it installed as a personal skill, the two copies share a name. Keep them in sync, or remove one.
 - The two projects are separate. A lesson learned in one is applied to the other by hand.

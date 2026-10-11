@@ -2,7 +2,7 @@
 
 Each lesson names its source and, where it led to work, the backlog item.
 
-The lessons below come from Snakestone, the framework's first project. Their sources name files in that repository, not this one.
+The lessons below come from the framework's first project. Their sources name files in that repository, not this one.
 
 ## Re-examine before re-patching
 
