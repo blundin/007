@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
-"""Copy the framework into a new project or an existing repo.
+"""Copy the framework into a new project or an existing repo, or remove it.
 
     007 new <dir>   create <dir>, run git init, and copy the framework
     007 init        copy the framework into the current repo
+    007 remove      delete the framework files that are unchanged since install
 
 Existing files are never overwritten. Nothing is committed.
 """
 
 import argparse
+import re
 import shutil
 import subprocess
 import sys
@@ -117,32 +119,124 @@ def new(directory: str) -> None:
     copy_framework(target)
 
 
-def init() -> None:
+def repo_top_level(command: str) -> Path:
     target = Path.cwd()
     try:
         top_level = Path(git(target, "rev-parse", "--show-toplevel").strip())
     except RefusedError:
         raise RefusedError(f"{target} is not in a git repo") from None
     if top_level.resolve() != target.resolve():
-        raise RefusedError(f"run 007 init from the top level of the repo: {top_level}")
+        raise RefusedError(
+            f"run 007 {command} from the top level of the repo: {top_level}"
+        )
+    return target
+
+
+def init() -> None:
+    target = repo_top_level("init")
     require_clean_framework()
     copy_framework(target)
 
 
+def installed_commit(target: Path) -> str:
+    version_file = target / VERSION_FILE
+    if version_file.is_symlink() or not version_file.is_file():
+        raise RefusedError(f"no {VERSION_FILE}, so nothing says what was installed")
+    commit = version_file.read_text().strip()
+    if not re.fullmatch(r"[0-9a-f]{40}|[0-9a-f]{64}", commit):
+        raise RefusedError(f"{VERSION_FILE} does not hold a commit: {commit!r}")
+    try:
+        git(CHECKOUT, "cat-file", "-e", f"{commit}^{{commit}}")
+    except RefusedError:
+        raise RefusedError(
+            f"{CHECKOUT} does not have commit {commit} from {VERSION_FILE}"
+        ) from None
+    return commit
+
+
+def installed_blobs(commit: str) -> dict[str, str]:
+    try:
+        tree = git(CHECKOUT, "ls-tree", "-r", "-z", f"{commit}:framework")
+    except RefusedError:
+        raise RefusedError(f"commit {commit} has no framework/ directory") from None
+    blobs: dict[str, str] = {}
+    for entry in tree.split("\0"):
+        if not entry:
+            continue
+        info, relative = entry.split("\t", 1)
+        _mode, kind, blob = info.split()
+        if kind == "blob":
+            blobs[relative] = blob
+    return blobs
+
+
+def plan_remove(target: Path, blobs: dict[str, str]) -> tuple[list[str], list[str]]:
+    root = target.resolve()
+    present: list[str] = []
+    kept: list[str] = []
+    for relative in sorted(blobs):
+        path = target / relative
+        if not path.resolve().is_relative_to(root):
+            raise RefusedError(f"{relative} leads outside {root}; nothing removed")
+        if path.is_symlink() or (path.exists() and not path.is_file()):
+            kept.append(relative)
+        elif path.exists():
+            present.append(relative)
+    if not present:
+        return [], kept
+    hashes = git(
+        CHECKOUT,
+        "hash-object",
+        "--no-filters",
+        "--",
+        *(str(target / relative) for relative in present),
+    ).split()
+    to_remove: list[str] = []
+    for relative, current in zip(present, hashes, strict=True):
+        if current == blobs[relative]:
+            to_remove.append(relative)
+        else:
+            kept.append(relative)
+    return to_remove, sorted(kept)
+
+
+def remove() -> None:
+    target = repo_top_level("remove")
+    to_remove, kept = plan_remove(target, installed_blobs(installed_commit(target)))
+    for relative in to_remove:
+        (target / relative).unlink()
+    (target / VERSION_FILE).unlink()
+    emptied = {parent for relative in to_remove for parent in Path(relative).parents}
+    for directory in sorted(emptied, key=lambda p: len(p.parts), reverse=True):
+        path = target / directory
+        if directory.parts and not any(path.iterdir()):
+            path.rmdir()
+    print(f"Removed {len(to_remove)} files and {VERSION_FILE}.")
+    if kept:
+        print("Kept, because they differ from what was installed:")
+        for relative in kept:
+            print(f"  {relative}")
+
+
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(
-        prog="007", description="Copy the framework into a project."
+        prog="007", description="Copy the framework into a project, or remove it."
     )
     commands = parser.add_subparsers(dest="command", required=True)
     new_parser = commands.add_parser("new", help="create a new project")
     new_parser.add_argument("directory")
     commands.add_parser("init", help="add the framework to the current repo")
+    commands.add_parser(
+        "remove", help="remove the framework files that are unchanged since install"
+    )
     args = parser.parse_args(argv)
     try:
         if args.command == "new":
             new(args.directory)
-        else:
+        elif args.command == "init":
             init()
+        else:
+            remove()
     except RefusedError as error:
         print(f"007: {error}", file=sys.stderr)
         return 1

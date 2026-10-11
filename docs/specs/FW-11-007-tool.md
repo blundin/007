@@ -6,12 +6,13 @@ Decision record: [ADR-001](../adr/ADR-001-007-tool.md), as amended (simplified t
 
 ## Goal
 
-Like `rails new`, but small. A developer at Austin Stone can put the framework into a new project or an existing repo with one command, then follow the printed steps to configure it.
+Like `rails new`, but small. A developer at Austin Stone can put the framework into a new project or an existing repo with one command, then follow the printed steps to configure it. One more command takes it out again.
 
     git clone git@github.com:TheAustinStone/007.git ~/tools/007
 
     ~/tools/007/bin/007 new myapp    # new directory, git init, copy the framework
     ~/tools/007/bin/007 init         # copy the framework into the current repo
+    ~/tools/007/bin/007 remove       # delete the framework files that are unchanged since install
 
 ## What it copies
 
@@ -30,10 +31,13 @@ Like `rails new`, but small. A developer at Austin Stone can put the framework i
 - **BOTH-03**: Neither command writes outside the target directory, makes a commit, or uses the network.
 - **BOTH-04**: Both commands exit non-zero and write nothing if a tracked file under `framework/` in 007's checkout has uncommitted changes, staged or not, so `.007-version` always matches what was copied.
 - **INIT-03**: `007 init` exits non-zero and writes nothing if a file stands where the framework needs a directory.
+- **REMOVE-01**: `007 remove` deletes every framework file whose contents match the commit in `.007-version`, then `.007-version` itself, then any directory those deletions left empty. It makes no commit.
+- **REMOVE-02**: `007 remove` keeps and lists every framework path whose contents differ from that commit, whether the project changed it after install or had its own file there before.
+- **REMOVE-03**: `007 remove` exits non-zero and deletes nothing if it isn't run from the top level of a git repo, if `.007-version` is missing or doesn't name a commit 007's checkout has, or if a framework path leads outside the repo.
 
 ## Threat model
 
-Trusted developers, running it on their own machines. The tests defend against damage to the target repo: overwriting an existing file, writing outside the target directory (including through a symlink already in the target), or a half-finished copy after an error.
+Trusted developers, running it on their own machines. The tests defend against damage to the target repo: overwriting an existing file, writing or deleting outside the target directory (including through a symlink already in the target), deleting a file the project changed, or a half-finished copy after an error.
 
 ## How it's built
 
@@ -45,7 +49,8 @@ Trusted developers, running it on their own machines. The tests defend against d
 
 - An adoption check, if teams get the setup wrong.
 - A `/007` skill that fills in the profile.
-- Updates. `.007-version` records the starting point.
+- Updates. `.007-version` records the starting point, and `remove` already compares against it.
+- Removing the untracked caches the hooks' tools leave (`.mypy_cache`, `.ruff_cache`, `__pycache__`). `remove` leaves them, along with the directories that hold them.
 
 ## Open questions
 
