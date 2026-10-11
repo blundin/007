@@ -28,6 +28,8 @@ Like `rails new`, but small. A developer at Austin Stone can put the framework i
 - **BOTH-01**: Both commands write `.007-version`, a single line holding the commit of 007's checkout.
 - **BOTH-02**: Both commands end by printing the next steps: set the lanes, fill in the `FILL` markers, write the three scripts, run `./scripts/check-dev-framework`, and commit.
 - **BOTH-03**: Neither command writes outside the target directory, makes a commit, or uses the network.
+- **BOTH-04**: Both commands exit non-zero and write nothing if a tracked file under `framework/` in 007's checkout has uncommitted changes, staged or not, so `.007-version` always matches what was copied.
+- **INIT-03**: `007 init` exits non-zero and writes nothing if a file stands where the framework needs a directory.
 
 ## Threat model
 

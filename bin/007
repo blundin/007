@@ -49,6 +49,15 @@ def framework_files() -> list[str]:
     return sorted(path for path in tracked.split("\0") if path)
 
 
+def require_clean_framework() -> None:
+    status = git(FRAMEWORK, "status", "--porcelain", "--untracked-files=no", "--", ".")
+    if status:
+        raise RefusedError(
+            f"{FRAMEWORK} has uncommitted changes, and .007-version would not"
+            " match what is copied; commit or stash them first"
+        )
+
+
 def plan_copy(target: Path, files: list[str]) -> tuple[list[str], list[str]]:
     root = target.resolve()
     to_copy: list[str] = []
@@ -57,6 +66,14 @@ def plan_copy(target: Path, files: list[str]) -> tuple[list[str], list[str]]:
         destination = target / relative
         if not destination.resolve().is_relative_to(root):
             raise RefusedError(f"{relative} leads outside {root}; nothing written")
+        for parent in Path(relative).parents:
+            in_the_way = target / parent
+            exists = in_the_way.is_symlink() or in_the_way.exists()
+            if exists and not in_the_way.is_dir():
+                raise RefusedError(
+                    f"{parent} is a file, but {relative} needs it to be a"
+                    " directory; nothing written"
+                )
         if destination.is_symlink() or destination.exists():
             skipped.append(relative)
         else:
@@ -94,6 +111,7 @@ def new(directory: str) -> None:
     target = Path(directory)
     if target.exists() or target.is_symlink():
         raise RefusedError(f"{target} already exists")
+    require_clean_framework()
     target.mkdir(parents=True)
     git(target, "init", "-q")
     copy_framework(target)
@@ -107,6 +125,7 @@ def init() -> None:
         raise RefusedError(f"{target} is not in a git repo") from None
     if top_level.resolve() != target.resolve():
         raise RefusedError(f"run 007 init from the top level of the repo: {top_level}")
+    require_clean_framework()
     copy_framework(target)
 
 

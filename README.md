@@ -37,7 +37,7 @@ Every batch goes RED, GREEN, REFACTOR, with a checkpoint commit after each phase
        007 new myapp    # new directory, git init, copy
        007 init         # into the current repo, from its top level
 
-   The clone is the installed version. To pin a release, check out its tag (`git -C ~/tools/007 checkout v0.1.0`); to upgrade, pull or check out a newer tag, and read `CHANGELOG.md` for what changed. Copy from a clean checkout, since `.007-version` records the commit, not local edits.
+   The clone is the installed version. To pin a release, check out its tag (`git -C ~/tools/007 checkout v0.1.0`); to upgrade, pull or check out a newer tag, and read `CHANGELOG.md` for what changed. `007` refuses to copy while `framework/` has uncommitted changes, since `.007-version` records the commit, not local edits.
 
    It never overwrites a file. Anything that already exists is skipped and listed. For `CLAUDE.md`, `AGENTS.md`, `.claude/settings.json`, and `.gitignore`, it names the file to merge by hand. It records the 007 commit it copied from in `.007-version`.
 2. **Set the lanes.** Edit `.claude/lanes.json` so `src` and `test` list the path prefixes each lane may write, each ending in `/`. A Rails app might use `{"test": ["spec/"], "src": ["app/", "lib/"]}`.

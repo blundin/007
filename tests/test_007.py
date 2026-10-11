@@ -362,3 +362,61 @@ def test_init_refuses_a_dangling_symlink_that_leads_outside_the_repo(
 
     assert not target.exists()
     assert "CLAUDE.md" in result.stdout + result.stderr
+
+
+# BOTH-04
+
+
+@pytest.mark.parametrize("command", ["new", "init"])
+def test_refuses_a_framework_file_with_uncommitted_changes(
+    checkout: Path, repo: Path, tmp_path: Path, command: str
+) -> None:
+    (checkout / "framework" / "AGENTS.md").write_text("an uncommitted edit\n")
+
+    if command == "new":
+        result = run_007(checkout, tmp_path, "new", "myapp")
+        assert not (tmp_path / "myapp").exists()
+    else:
+        result = run_007(checkout, repo, "init")
+        assert all_files(repo) == {"app.py"}
+
+    assert result.returncode != 0
+    assert "uncommitted" in result.stderr
+
+
+def test_init_refuses_a_staged_framework_file(checkout: Path, repo: Path) -> None:
+    write_files(checkout / "framework", {".claude/agents/new.md": "staged\n"})
+    git(checkout, "add", "framework/.claude/agents/new.md")
+
+    result = run_007(checkout, repo, "init")
+
+    assert result.returncode != 0
+    assert all_files(repo) == {"app.py"}
+
+
+def test_init_ignores_uncommitted_changes_outside_the_framework(
+    checkout: Path, repo: Path
+) -> None:
+    (checkout / "README.md").write_text("an uncommitted edit\n")
+    write_files(checkout / "framework", {"notes.txt": "untracked\n"})
+
+    result = run_007(checkout, repo, "init")
+
+    assert result.returncode == 0, result.stderr
+    assert not (repo / "notes.txt").exists()
+
+
+# INIT-03
+
+
+def test_init_refuses_a_file_where_a_directory_is_needed(
+    checkout: Path, repo: Path
+) -> None:
+    write_files(repo, {"docs": "notes\n"})
+
+    result = run_007(checkout, repo, "init")
+
+    assert result.returncode != 0
+    assert "docs" in result.stderr
+    assert "Traceback" not in result.stderr
+    assert all_files(repo) == {"app.py", "docs"}

@@ -9,6 +9,8 @@ Changes to `framework/` that an adopter would notice. Versions are git tags; `gi
 - Neither agent is part of the loop in `CLAUDE.md`; the main session or the human dispatches them.
 - Added `docs/adr/README.md`.
 - Unwrapped the Markdown files so each paragraph and list item is one line. The wording is unchanged.
+- `bin/007 new` and `init` now refuse to copy while `framework/` has uncommitted changes, so `.007-version` always matches what was copied.
+- `bin/007 init` now refuses up front, writing nothing, when a file stands where the framework needs a directory. It used to crash partway through the copy.
 
 ## v0.1.0 (2026-10-05)
 
