@@ -27,7 +27,17 @@ Every batch goes RED, GREEN, REFACTOR, with a checkpoint commit after each phase
 
 ## Adopting
 
-1. **Copy the framework** with `bin/007`. Install it once by cloning this repo and linking the command onto your `PATH`:
+1. **Copy the framework** with `bin/007`. It needs only `git` and `python3`, and runs from a clone of this repo. There's nothing else to install.
+
+   **For one project**, clone, copy, and delete the clone. Run `init` from the project's top level:
+
+       git clone git@github.com:TheAustinStone/007.git /tmp/007
+       /tmp/007/bin/007 init
+       rm -rf /tmp/007
+
+   To pin a release, run `git -C /tmp/007 checkout v0.1.0` before `init`. To take the framework out later, clone again the same way and run `/tmp/007/bin/007 remove`.
+
+   **For many projects**, keep the clone and link the command onto your `PATH`:
 
        git clone git@github.com:TheAustinStone/007.git ~/tools/007
        ln -s ~/tools/007/bin/007 ~/.local/bin/007
@@ -38,11 +48,11 @@ Every batch goes RED, GREEN, REFACTOR, with a checkpoint commit after each phase
        007 init         # into the current repo, from its top level
        007 remove       # take it out again, from the top level
 
-   The clone is the installed version. To pin a release, check out its tag (`git -C ~/tools/007 checkout v0.1.0`); to upgrade, pull or check out a newer tag, and read `CHANGELOG.md` for what changed. `007` refuses to copy while `framework/` has uncommitted changes, since `.007-version` records the commit, not local edits.
+   The kept clone is the installed version. To pin a release, check out its tag (`git -C ~/tools/007 checkout v0.1.0`); to upgrade, pull or check out a newer tag, and read `CHANGELOG.md` for what changed. `007` refuses to copy while `framework/` has uncommitted changes, since `.007-version` records the commit, not local edits.
 
    It never overwrites a file. Anything that already exists is skipped and listed. For `CLAUDE.md`, `AGENTS.md`, `.claude/settings.json`, and `.gitignore`, it names the file to merge by hand. It records the 007 commit it copied from in `.007-version`.
 
-   `007 remove` uses that commit to find the framework files. It deletes the ones that still match it, and keeps and lists any you've changed, such as a filled-in `AGENTS.md`. Your clone needs that commit. Any clone of the repo you installed from has it, whatever tag is checked out. Nothing is committed.
+   `007 remove` uses that commit to find the framework files. It deletes the ones that still match it, and keeps and lists any you've changed, such as a filled-in `AGENTS.md`. Your clone needs that commit. Any clone of the repo you installed from has it, whatever tag is checked out. Don't clone with `--depth 1`: a shallow clone lacks older commits, so `007 remove` would refuse. Nothing is committed.
 2. **Set the lanes.** Edit `.claude/lanes.json` so `src` and `test` list the path prefixes each lane may write, each ending in `/`. A Rails app might use `{"test": ["spec/"], "src": ["app/", "lib/"]}`.
 3. **Write the three scripts.** Replace the placeholder bodies:
    - `scripts/check`: the full gate (lint, format, strict types, every test, coverage). Exit 0 only if everything passes. CI should run it too.
