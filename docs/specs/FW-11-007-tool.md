@@ -29,7 +29,7 @@ Like `rails new`, but small. A developer can put the framework into a new projec
 - **INIT-03**: `007 init` exits non-zero and writes nothing if a file stands where the framework needs a directory.
 - **INIT-04**: `007 init` exits non-zero and writes nothing if `.007-version` already exists, even as a symlink, and says to run `007 remove` first. Installing over an older install would mix two versions that `remove` can't tell apart.
 - **BOTH-01**: Both commands write `.007-version`, a single line holding the commit of 007's checkout.
-- **BOTH-02**: Both commands end by printing the next steps: set the lanes, fill in the `FILL` markers, write the three scripts, run `./scripts/check-dev-framework`, and commit.
+- **BOTH-02**: Both commands end by printing the next steps: run `/007-setup` in Claude Code, or by hand set the lanes, fill in the `FILL` markers, write the three scripts, run `./scripts/check-dev-framework`, and commit.
 - **BOTH-03**: Neither command writes outside the target directory, makes a commit, or uses the network.
 - **BOTH-04**: Both commands exit non-zero and write nothing if a tracked file under `framework/` in 007's checkout has uncommitted changes, staged or not, so `.007-version` always matches what was copied.
 - **REMOVE-01**: `007 remove` deletes every framework file whose contents match the commit in `.007-version`, then `.007-version` itself, then any directory those deletions left empty. It makes no commit.

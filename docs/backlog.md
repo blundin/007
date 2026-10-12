@@ -6,6 +6,10 @@ IDs continue from the project where the framework was first built, so lessons an
 
 ## Todo
 
+### FW-15 Project setup skill
+
+Status: `doing`. Strip the first project's assumptions from the rules, move the profile examples into a `/007-setup` skill that inspects the repo and drafts the profile, lanes, and scripts for approval, and checks them for drift on later runs. Picks up FW-11's "a `/007` skill that fills in the profile". Spec in [`specs/FW-15-project-setup-skill.md`](specs/FW-15-project-setup-skill.md).
+
 ### FW-10 Retrospective after each feature
 
 A fixed step in the done criteria, not a Claude Code hook. After the manager reports `DONE`, the main session reviews the manager's report, the branch's commit history, and the checkpoint doc.

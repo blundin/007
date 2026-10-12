@@ -39,3 +39,9 @@ Source: updating `main` after PR #4, 2026-10-02.
 FW-11 acceptance passed on all three runs. Across four planning passes on Querying, the PM raised 7, 9, 3, and then 0 blocking questions, each of which would otherwise have stopped the test-engineer mid-run. It also caught a missing prerequisite, the models spec. Its weaknesses: two "next" runs ordered scopes differently when one choice was open; its "delivered" grep misses spec text added after delivery (the ERR-03 401 hint); and its citations drop escapes, quoting `\u0040x\u002Eorg` as `@x.org`. Set a stopping point: once the remaining questions are single edge cases, record them as run decisions in the plan instead of running another pass.
 
 Source: `docs/checkpoint-query-compiler.md`, Framework. Led to: FW-10 retrospective input.
+
+## Examples bias the setup skill; probes must overrule them
+
+The first `/007-setup` trial ran on a default Rails app, which uses Minitest. The reference's Rails examples assumed RSpec, and four of them were wrong for it. The Stub convention example was harmful: Minitest reports a raised `NotImplementedError` as an Error, so a stub that follows the example makes every valid RED look invalid. The trial also showed that a test run writes to the repo (logs, caches), that the suite may not run at all, and that the draft had no place for findings outside the profile. The skill now says probes overrule examples, uses Minitest for its Rails examples, checks `git status` around every run, runs the existing suite first, and presents findings before questions.
+
+Source: FW-15 trial run on a scratch Rails 8.1 app, 2026-10-12. Led to: FW-15.

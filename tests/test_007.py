@@ -298,6 +298,7 @@ def test_prints_the_next_steps(
 
     steps = result.stdout.split("Next steps:")[-1]
     for expected in [
+        "/007-setup",
         ".claude/lanes.json",
         "FILL",
         "scripts/check",

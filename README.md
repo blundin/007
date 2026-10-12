@@ -77,16 +77,15 @@ No command commits, uses the network, or writes outside the repo. Review the cha
 
 ## Configure a project
 
-1. **Set the lanes.** Edit `.claude/lanes.json` so `src` and `test` list the path prefixes each lane may write, each ending in `/`. A Rails app might use `{"test": ["spec/"], "src": ["app/", "lib/"]}`.
-2. **Write the three scripts.** Replace the placeholder bodies:
-   - `scripts/check`: the full gate (lint, format, strict types, every test, coverage). Exit 0 only if everything passes. CI should run it too.
-   - `scripts/test <paths>`: run the named tests and print each outcome, in a way that tells a failed test from an errored one.
-   - `scripts/lint <paths>`: lint, format-check, and type-check the named files.
-3. **Fill in the Project profile.** In `AGENTS.md`, replace every `<!-- FILL ... -->` marker (`grep -n FILL AGENTS.md`). Each one has an example from a Python library.
-4. **Check the settings.** `.claude/settings.json` puts `git commit` on the `ask` list, so every commit stops and asks first. That's for signed commits whose key has to be unlocked, such as 1Password's SSH agent. If you don't sign commits, move it to `allow`.
-5. **Run the framework check.** `./scripts/check-dev-framework` should pass.
-6. **Write a spec** in `docs/specs/` with criterion IDs (see its README).
-7. **Start a session** and ask what's next. The main session dispatches the project manager, shows you the proposed scope and its questions, and waits for your approval before building anything.
+Everything project-specific lives in three places: the Project profile in `AGENTS.md`, `.claude/lanes.json`, and the scripts `check`, `test`, and `lint`. The agent definitions stay as shipped, so an upgrade replaces them cleanly and only `AGENTS.md` needs merging by hand.
+
+1. **Run `/007-setup`** in Claude Code. It reads the repo, runs a few probes, and drafts all three: the lanes, the script bodies, and every profile item, each marked with its evidence or the question it needs you to answer. It writes nothing until you approve. Run it again later to check the profile against the repo; it proposes updates when they've drifted apart. To do it by hand instead, follow `.claude/skills/007-setup/reference.md`, which explains every item with examples for a Python library, a Rails app, and a Swift app.
+2. **Check the settings.** `.claude/settings.json` puts `git commit` on the `ask` list, so every commit stops and asks first. That's for signed commits whose key has to be unlocked, such as 1Password's SSH agent. If you don't sign commits, move it to `allow`.
+3. **Run the framework check.** `./scripts/check-dev-framework` should pass.
+4. **Write a spec** in `docs/specs/` with criterion IDs (see its README).
+5. **Start a session** and ask what's next. The main session dispatches the project manager, shows you the proposed scope and its questions, and waits for your approval before building anything.
+
+The framework has opinions of its own: the TDD loop, and the architect's defaults (one deployable unit first, its pattern table, its testing stance). They're starting points, not requirements. A project can change them in its own copy of the agent files, at the cost of merging by hand on every upgrade.
 
 ## Upgrade a project
 
@@ -121,6 +120,7 @@ Inside `framework/`:
 | `.claude/lanes.json` | Lane paths |
 | `.claude/settings.json` | Permissions, including a deny on reading `.env` files |
 | `.claude/skills/review-tracker/` | Records findings in `docs/code-reviews/` |
+| `.claude/skills/007-setup/` | `/007-setup`: drafts the Project profile, lanes, and scripts from the repo, and checks them for drift |
 | `scripts/` | `check`, `test`, `lint` (yours to fill in), and `check-dev-framework` |
 | `docs/specs/`, `docs/plans/`, `docs/code-reviews/`, `docs/adr/` | Specs, scope plans, findings, decision records |
 

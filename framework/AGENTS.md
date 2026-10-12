@@ -31,7 +31,7 @@ These rules apply to every contributor, human or agent, whatever tool you use.
 - Write the test before the code.
 - Every test that verifies a spec requirement carries the criterion tag described in the Project profile.
 - A new test must first fail for a valid reason: an assertion about the targeted behavior, or the not-implemented signal from a stub (see the Project profile). It must never error at import, collection, or fixture setup.
-- Tests never touch the network. Use the HTTP mocking tool in the Project profile.
+- Tests never touch a live external system: HTTP services, databases, queues, the real clock, or the filesystem outside the test's own temporary space. Isolate each with the tools in the Project profile's Test isolation.
 - Tests that need a live external system are opt-in, run only locally, and are excluded by default.
 - Never put real personal data in the repository.
 
@@ -62,18 +62,18 @@ A change is done when every criterion ID in scope is referenced by the criterion
 
 ## Project profile
 
-Every agent reads this section. Fill in each item; the examples show what a Python library filled in.
+Every agent reads this section. Run `/007-setup` in Claude Code to draft it from the repo; it shows each value and its evidence before writing anything, and explains every item with examples.
 
-- **Language and tools:** <!-- FILL. Example: Python 3.13, uv, ruff, mypy strict, pytest. -->
-- **Fixture path:** <!-- FILL. Example: tests/fixtures/ -->
-- **Criterion tag:** <!-- FILL: how a test names the criterion it verifies, and the grep that finds it. Example: @pytest.mark.spec("AUTH-03"), found with grep -rn 'mark.spec("AUTH-03")' tests/ -->
-- **Stub convention:** <!-- FILL: what a scaffolded body does, so its tests fail rather than error. Example: raise NotImplementedError. -->
-- **Failure versus error:** <!-- FILL: how ./scripts/test output shows a failed test versus an errored one. Example: pytest -rA prints FAILED for an assertion and ERROR for a setup or collection problem. -->
-- **Banned suppressions:** <!-- FILL: the language's ways of silencing checks. Example: # type: ignore, # pragma: no cover, cast or Any used to silence the type checker, bare or broad except. -->
-- **Public interface:** <!-- FILL: what counts as observable behavior for a refactor. Example: this is a library, so every public name, signature, return type, raised exception, and error message. -->
-- **Runtime dependencies:** <!-- FILL. Example: httpx and Pydantic only. -->
-- **Test isolation:** <!-- FILL: the HTTP mocking tool and the property-testing library, if any. Example: respx; Hypothesis. -->
-- **Property-testing targets:** <!-- FILL: properties the test-engineer must cover with generated input, or "none". Example: no generated string can escape its literal in the compiled filter expression. -->
-- **Domain attacks:** <!-- FILL: project-specific attack categories for the test-engineer, or "none". Example, for an HTTP client: HTTP failures (401 versus 403, 404, 400 with error bodies, 429 with and without Retry-After, 5xx, timeouts, malformed JSON, empty bodies, HTML error pages); retries (non-idempotent requests are never retried, others only where the spec says it's safe); pagination (empty results, counts that change mid-iteration, the last page); and the upstream API returning 401 with an empty body, not 403, for a key that lacks permission. -->
-- **Domain notes:** <!-- FILL: path to verified behavior of external systems, or "none". Example: docs/upstream-api-notes.md -->
-- **Threat model:** <!-- FILL: who the adversarial tests defend against, or the spec section that says. Example: docs/specs/PRD.md, Threat model. -->
+- **Language and tools:** <!-- FILL: the language, its version, and the package manager, linter, formatter, type checker, and test runner. See /007-setup. -->
+- **Fixture path:** <!-- FILL: where test fixtures live, inside the test lane. See /007-setup. -->
+- **Criterion tag:** <!-- FILL: how a test names the criterion it verifies, and the grep that finds it. See /007-setup. -->
+- **Stub convention:** <!-- FILL: what a scaffolded body does, so its tests fail rather than error. See /007-setup. -->
+- **Failure versus error:** <!-- FILL: how ./scripts/test output tells a failed test from an errored one. See /007-setup. -->
+- **Banned suppressions:** <!-- FILL: the language's ways of silencing a check. See /007-setup. -->
+- **Public interface:** <!-- FILL: what counts as observable behavior for a refactor. See /007-setup. -->
+- **Runtime dependencies:** <!-- FILL: the only runtime dependencies allowed. See /007-setup. -->
+- **Test isolation:** <!-- FILL: how tests isolate each external system the project uses, and the property-testing library, if any. See /007-setup. -->
+- **Property-testing targets:** <!-- FILL: properties the test-engineer must cover with generated input, or "none". See /007-setup. -->
+- **Domain attacks:** <!-- FILL: attack categories specific to this project, or "none". See /007-setup. -->
+- **Domain notes:** <!-- FILL: path to verified behavior of external systems, or "none". See /007-setup. -->
+- **Threat model:** <!-- FILL: who the adversarial tests defend against, or the spec section that says. See /007-setup. -->

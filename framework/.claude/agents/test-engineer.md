@@ -60,7 +60,7 @@ When the library finds a failing example, pin it as an explicit example so it be
 
 ## Fixtures and isolation
 
-- Use the fixture path in the Project profile, synthetic data, and the profile's HTTP mocking tool for all HTTP. Tests never touch the network.
+- Use the fixture path in the Project profile and synthetic data. Tests never touch a live external system; isolate each one with the tools in the profile's Test isolation.
 - Never introduce real personal data into fixtures.
 
 ## Forbidden
@@ -76,7 +76,7 @@ In adversarial mode and in final sweeps, work through every category. Mark one t
 
 - **Boundaries:** empty, null, zero, negative, maximum values, exact page-size multiples
 - **Shape mismatches:** missing fields, extra fields, null in fields the spec says are non-null, key casing that differs from the spec
-- **String hazards:** quotes, backslashes, unicode, very long strings, expression or query injection
+- **String hazards:** quotes, backslashes, unicode, very long strings, and injection into whatever the code builds: queries, shell commands, markup, or expressions
 - **Time:** naive versus aware datetimes, time zones, the date formats external systems use
 - **Concurrency:** shared state and re-entrancy, such as sync wrappers called from inside a running event loop
 - **Conversions:** values that fail conversion into the typed models the spec declares

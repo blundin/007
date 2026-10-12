@@ -4,6 +4,13 @@ Changes to `framework/` and `bin/007` that an adopter would notice. Versions are
 
 ## Unreleased
 
+- Added the `/007-setup` skill. It inspects the repo and drafts the Project profile, `.claude/lanes.json`, and the three scripts, each value with its evidence, and writes only what you approve. Run again, it checks the profile against the repo and proposes updates. Its `reference.md` explains every item with examples for a Python library, a Rails app, and a Swift app.
+- The Project profile's `FILL` comments are one line each and point to `/007-setup`; the Python examples moved to the skill.
+- Tests now stay off every live external system (HTTP services, databases, queues, the real clock, the filesystem), not just the network. `Test isolation` asks how each one is isolated.
+- The test engineer's String hazards cover injection into whatever the code builds: queries, shell commands, markup, or expressions.
+- Triage proposes adding project-specific hazards from sweeps and reviews to the profile's `Domain attacks` or `Domain notes`, for the human to approve.
+- `bin/007`'s next steps start with `/007-setup`.
+
 - Added the `architect` agent. It recommends one option and records ADRs in `docs/adr/`. The new `adr_write_guard.py` hook limits it to Markdown files there.
 - Added the `reviewer` agent, an independent code reviewer that records findings through the `review-tracker` skill.
 - Neither agent is part of the batch loop; the main session dispatches them (see below), or the human does.

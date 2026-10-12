@@ -25,11 +25,13 @@ VERSION_FILE = ".007-version"
 
 NEXT_STEPS = """
 Next steps:
-  1. Set the src and test lanes in .claude/lanes.json.
-  2. Fill in every FILL marker: grep -rn FILL AGENTS.md
-  3. Write scripts/check, scripts/test, and scripts/lint for your stack.
-  4. Run ./scripts/check-dev-framework.
-  5. Review the changes and commit them.
+  1. Start Claude Code here and run /007-setup. It drafts steps 2 to 4 from
+     the repo for you to approve. Or do them by hand:
+  2. Set the src and test lanes in .claude/lanes.json.
+  3. Fill in every FILL marker: grep -rn FILL AGENTS.md
+  4. Write scripts/check, scripts/test, and scripts/lint for your stack.
+  5. Run ./scripts/check-dev-framework.
+  6. Review the changes and commit them.
 """
 
 
