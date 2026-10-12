@@ -24,7 +24,7 @@ These rules apply to every contributor, human or agent, whatever tool you use.
 ## Specs
 
 - Changes in the `src` lane are driven by acceptance-criterion IDs in a spec, such as `AUTH-03` or `PAGE-06`.
-- Specs under `docs/specs/` are written and approved by humans. Don't edit them.
+- Specs under `docs/specs/` are written and approved by humans. Edit one only when a human explicitly directs it, and only with their approval of the specific changes.
 
 ## Test rules
 

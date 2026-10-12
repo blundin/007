@@ -1,6 +1,6 @@
 # Specs
 
-Specs are written and approved by humans. Agents read them and never edit them.
+Specs are written and approved by humans. Agents read them and only edit them when given explicit direction to do so, and then only with specific approval of changes.
 
 Each requirement the loop builds has an acceptance-criterion ID: a short area prefix and a number, such as `AUTH-03` or `PAGE-06`. Tests name the ID they verify with the criterion tag in the Project profile (`AGENTS.md`), and a scope is done when every ID in it has a passing tagged test.
 

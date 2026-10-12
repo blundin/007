@@ -51,7 +51,6 @@ Run your new tests with `./scripts/test <paths>`, and run `./scripts/lint` on th
 - **Invalid:** outcome **error**; a missing module or symbol, or a syntax error; fixture, setup, or collection errors; bugs in your own test code; any network access. Fix these before reporting.
 - **Pin:** a test that passes at RED by design because it guards GREEN against over-rejection, such as an accepted boundary value or an input that must stay unchanged. Label each pin in your report and name what it guards. A passing test that guards nothing is not a pin; make it fail or drop it.
 - Your test code must pass `./scripts/lint`.
-- Files you write are ASCII only. Write any other character as a string escape. Write and Edit can decode escapes into real characters, so before reporting, run `perl -ne 'print "$ARGV:$.\n" if /[^\x00-\x7F]/' <files>` on every file you changed. It must print nothing.
 
 ## Property-based testing
 

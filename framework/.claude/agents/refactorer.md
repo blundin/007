@@ -62,7 +62,6 @@ Report a Hand-rolled Parsing or Denylist Sanitization case you can't remove with
 - Fixing bugs. Report them instead; they become targets for the next RED batch.
 - New features or "while I'm here" changes
 - Performance changes not motivated by a smell
-- Non-ASCII characters in files you write. Write them as string escapes. Write and Edit can decode escapes into real characters, so before reporting, run `perl -ne 'print "$ARGV:$.\n" if /[^\x00-\x7F]/' <files>` on every file you changed. It must print nothing.
 
 ## Report format
 

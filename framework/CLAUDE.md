@@ -1,6 +1,6 @@
 @AGENTS.md
 
-# Adversarial TDD Loop
+# TDD Loop
 
 This loop governs every change in the `src` lane (`.claude/lanes.json`). Changes to docs, specs, CI, or configuration do not use it. It enforces the rules in AGENTS.md through separate subagents and lanes.
 
@@ -9,7 +9,7 @@ This loop governs every change in the `src` lane (`.claude/lanes.json`). Changes
 The main session delegates. It plans each scope with `project-manager` before building it:
 
 1. Dispatch `project-manager` with the spec path and either a requested scope or "next". Dispatch it when the human asks what's next or asks to start a scope; when the engineering manager reports `DONE` and the human has merged its PR (run "next"); and when the human changes a spec or answers one of its open questions.
-2. On `BLOCKED`, relay the PM's questions to the human and resume the PM with the answers. Spec changes are the human's to make. A question about design goes to `architect` first (see Triage).
+2. On `BLOCKED`, relay the PM's questions to the human and resume the PM with the answers. Spec changes are the human's to decide: edit a spec only when the human directs it, and show the exact change for approval before writing it. A question about design goes to `architect` first (see Triage).
 3. If the PM's `Design decisions` isn't `none`, dispatch `architect` in `recommend` mode for each decision before going further. In either mode, present those recommendations and wait for the human to decide each one. In "next" mode, present the proposed scope, its order rationale, any questions, and the architect's recommendations to the human, and wait for approval. A changed scope goes back to the PM as a requested scope. Never build a proposal without approval.
 4. On `READY` (and approval), create the feature branch. For each design decision the human made, dispatch `architect` in `record` mode to write the accepted ADR. Write the plan to `docs/plans/<scope>.md` with `Status: planned`, an `## ADRs` section listing every ADR that bears on the scope (new ones and those the PM named), and a closing `## Decisions` section. Commit the ADRs and the plan together.
 
@@ -34,7 +34,7 @@ If anything doesn't match, resume the manager with the discrepancy. Never presen
 
 ### Review before the PR
 
-After a verified `DONE`, dispatch `reviewer` on the branch's diff against `main`, with the spec and plan paths. The reviewer returns findings without writing them; record them with the `review-tracker` skill, mapping its severities as `reviewer.md` says.
+After a verified `DONE`, dispatch `reviewer`. The reviewer's value is that it hasn't seen how the change was built, so its prompt carries exactly three things and nothing else: the commit range (`main..HEAD`, or the new commits on a re-review), the spec path, and the plan path. Never add the manager's report, the triad's reports, your own summary, or why the code was written the way it was. The reviewer returns findings without writing them; record them with the `review-tracker` skill, mapping its severities as `reviewer.md` says.
 
 - Findings the reviewer marks `design` go to `architect`, not to the manager as RED targets; a test can't express a wrong abstraction. Handle them as design questions (see Triage). If the human accepts a structural change, send the manager the accepted ADR and the finding IDs for a structure-only batch.
 - Triage every other Blocker and Major against the threat model, as for sweep findings. Send the ones that stand back to the manager as targets for a new batch, with their finding IDs.

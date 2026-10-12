@@ -22,6 +22,10 @@ A fixed step in the done criteria, not a Claude Code hook. After the manager rep
 
 An agent that works this backlog: records lessons, writes framework specs, and proposes changes for human approval. Lane: `framework/.claude/agents/`, the loop rules in `framework/CLAUDE.md`, and 007's `docs/`. Never `framework/.claude/hooks/` or settings. When it's built, FW-10 dispatches it.
 
+### FW-13 Optional cross-model reviewer
+
+The reviewer runs on the same model family that wrote the code, so they share blind spots. An optional second review on a different model (for example through Codex) would give real independence. Opt-in per project; the Claude reviewer stays the default. Decide first whether its findings merge into the same `review-tracker` session or stay separate. This is the one place tool neutrality earns its cost; the rest of the framework stays optimized for Claude Code.
+
 ### FW-02 Engineering manager, phase 2: parallel triads
 
 Up to three triads, each in its own git worktree and branch, merged by the manager after `./scripts/check` passes. Start only after the single-triad loop has run a feature cleanly in this project.

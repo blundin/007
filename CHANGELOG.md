@@ -30,6 +30,11 @@ Changes to `framework/` and `bin/007` that an adopter would notice. Versions are
 - The `reviewer` now runs `git_guard.py` on Bash, so it is held to read-only git.
 - The `architect`'s write guard now matches `MultiEdit` and `NotebookEdit` as well as `Write` and `Edit`.
 - Added `test_agent_wiring.py`, which checks every agent's tools against its hooks: shell users run the git guard, file writers run a write guard, and dispatchers run the agent guard.
+- Renamed the "Adversarial TDD Loop" to the "TDD loop" in `CLAUDE.md` and the agent definitions. Adversarial testing is one mode of the test engineer, not the name of the framework.
+- The reviewer's dispatch prompt is now fixed: the commit range, the spec path, and the plan path, never the builders' reports or reasoning. The reviewer doesn't read `docs/code-reviews/` session files, only `known-issues.json`.
+- The reviewer now reads the spec and plan and checks spec conformance: unmet criteria, narrower readings, untagged tests, and unrequested behavior.
+- Agents may now edit a spec, but only when a human explicitly directs it and approves the specific change. `AGENTS.md`, `CLAUDE.md`, and `docs/specs/README.md` all say so.
+- Removed the ASCII-only rule for files the test engineer, app developer, and refactorer write, along with its `perl` check. `perl` is no longer a requirement.
 - `.claude/settings.json` now allows `git worktree`, which the loop's Setup step uses, and denies reading `.env` and `.env.*`.
 
 ## v0.1.0 (2026-10-05)

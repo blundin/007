@@ -1,32 +1,37 @@
 # 007: The Agentic Development Framework
 
-A framework for Claude Code that builds software from specs with a team of agents that check each other's work. A test engineer tries to prove the code fails its spec, a developer writes the minimum code that passes, and a refactorer cleans up with tests locked. Each one is held to its own folder by hooks, and the coordinator verifies every phase before it commits. A small command, `bin/007`, puts the framework into a project and takes it out again.
+A framework for Claude Code that builds software from specs with a team of seven agents that check each other's work. A project manager turns the spec into ordered scopes, and an architect recommends any structure a scope sets and records the decision as an ADR. An engineering manager runs each scope in test-first batches with a triad: a test engineer tries to prove the code fails its spec, an app developer writes the minimum code that passes, and a refactorer cleans up with tests locked. A reviewer with no stake in the change checks the whole branch before it reaches you as a PR. Hooks hold each agent to what it may write, the engineering manager verifies every phase before it commits, and the main session verifies every report before trusting it. A small command, `bin/007`, puts the framework into a project and takes it out again.
 
 It works with any language. Each project fills in three scripts and a short profile, and the loop does the rest.
 
 ## How it works
 
-    human ── approves scopes, answers questions, merges PRs
-      │
-    main session ── plans with the PM, dispatches the EM, records findings
-      ├── project-manager      what to build next; cites the spec; read-only
-      ├── engineering-manager  runs a scope to done; never writes code
-      │     ├── test-engineer  RED: failing tests        (test lane)
-      │     ├── app-developer  GREEN: minimum code       (src lane)
-      │     └── refactorer     REFACTOR: structure only  (src lane)
-      │
-      │   outside the batch loop:
-      ├── architect            structural decisions; the only author of ADRs
-      └── reviewer             independent review before each PR
+Each scope goes through four stages. The main session runs them and stops for you where marked.
 
-Every batch goes RED, GREEN, REFACTOR, with a checkpoint commit after each phase and a diff check after every dispatch. When the engineering manager reports done, the main session verifies the report against the tests and git history, then has the reviewer check the whole branch before it goes to you as a PR. The human's answers are recorded in each plan's `## Decisions`, so no agent asks twice. When a scope sets new structure, such as a module boundary, a dependency, or persistence, the architect recommends a design before building starts. The accepted decision becomes an ADR that the developer and refactorer work within. The rules are in `CLAUDE.md` (the loop) and `AGENTS.md` (rules for every contributor, plus the Project profile). Review findings are kept in `docs/code-reviews/` by the bundled `review-tracker` skill.
+    PLAN     project-manager      what to build next; cites the spec; read-only
+             architect            recommends any structure the scope sets; the only author of ADRs
+             ── you approve the scope and decide each design question
+    BUILD    engineering-manager  runs the scope in batches; never writes code
+               test-engineer      RED: failing tests        (test lane)
+               app-developer      GREEN: minimum code       (src lane)
+               refactorer         REFACTOR: structure only  (src lane)
+             ── the main session verifies the report against the tests and git history
+    REVIEW   reviewer             independent review of the whole branch
+    PR       ── you review and merge
+
+**Plan.** The project manager proposes a scope and lists every question that blocks it. When a scope sets new structure, such as a module boundary, a dependency, or persistence, the architect recommends a design, and the accepted decision becomes an ADR that the developer and refactorer work within. Your answers are recorded in the plan's `## Decisions`, so no agent asks twice.
+
+**Build.** Every batch goes RED, GREEN, REFACTOR, with a checkpoint commit after each phase and a diff check after every dispatch. The scope ends with an adversarial sweep and a final refactor pass. When the engineering manager reports done, the main session checks the claim before trusting it.
+
+**Review.** The reviewer reads the whole branch with the spec and plan, but none of the builders' reports or reasoning, so its reading is independent. Blockers and Majors go back to the engineering manager as a new batch; design findings go to the architect. Review happens once per scope, not per batch: per-batch review would see only fragments and would put the engineering manager in charge of triaging findings about its own team's work.
+
+The rules are in `CLAUDE.md` (the loop) and `AGENTS.md` (rules for every contributor, plus the Project profile). Review findings are kept in `docs/code-reviews/` by the bundled `review-tracker` skill.
 
 ## Requirements
 
 - Claude Code
 - `git` and `python3`, for `bin/007` and the hooks, whatever the project's language
 - `uv`, for `./scripts/check-dev-framework` (the hooks' own tests)
-- `perl`, for the agents' ASCII check
 - `gh`, if you want the main session to open PRs
 
 ## Install
@@ -107,10 +112,10 @@ Inside `framework/`:
 
 | Path | Contents |
 |---|---|
-| `CLAUDE.md` | The Adversarial TDD Loop: roles, phases, diff check, triage, done criteria |
+| `CLAUDE.md` | The TDD loop: roles, phases, diff check, triage, done criteria |
 | `AGENTS.md` | Rules for every contributor, and the Project profile |
 | `.gitignore` | Caches and `.env` files |
-| `.claude/agents/` | Seven agents: the five loop agents, plus `architect` and `reviewer`, which run outside the loop |
+| `.claude/agents/` | Seven agents: `project-manager` and `architect` (plan), `engineering-manager` and its triad (build), and `reviewer` (review) |
 | `.claude/hooks/` | `lane_guard.py`, `git_guard.py`, `adr_write_guard.py`, `agent_guard.py`, their tests (including one that checks every agent's tools are guarded), and the configs for their checks |
 | `.claude/lanes.json` | Lane paths |
 | `.claude/settings.json` | Permissions, including a deny on reading `.env` files |

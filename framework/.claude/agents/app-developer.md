@@ -46,7 +46,6 @@ The coordinator gives you the failing test paths and their output, the spec, the
 - The Project profile's banned suppressions, such as silencing the type checker, excluding code from coverage, or catching broad exceptions to make tests pass
 - Public API beyond what the spec declares
 - Adding dependencies; request them from the coordinator instead
-- Non-ASCII characters in files you write. Write them as string escapes. Write and Edit can decode escapes into real characters, so before reporting, run `perl -ne 'print "$ARGV:$.\n" if /[^\x00-\x7F]/' <files>` on every file you changed. It must print nothing.
 
 ## When something is wrong
 
