@@ -1,0 +1,36 @@
+{
+  "last_updated": "2026-10-12T19:45:04Z",
+  "open_count": 3,
+  "issues": [
+    {
+      "id": "20261012192429-013",
+      "review_file": "20261012192429-007-docs-tighten-alignment.json",
+      "severity": "info",
+      "category": "convention",
+      "title": "Lessons cite backlog items that don't exist",
+      "file": "docs/lessons.md",
+      "line": 11,
+      "status": "open"
+    },
+    {
+      "id": "20261012192429-014",
+      "review_file": "20261012192429-007-docs-tighten-alignment.json",
+      "severity": "info",
+      "category": "convention",
+      "title": "007 has no CI",
+      "file": "scripts/check",
+      "line": 1,
+      "status": "open"
+    },
+    {
+      "id": "20261012192429-015",
+      "review_file": "20261012192429-007-docs-tighten-alignment.json",
+      "severity": "info",
+      "category": "correctness",
+      "title": "Batch splitting will prompt mid-run",
+      "file": "framework/.claude/settings.json",
+      "line": 19,
+      "status": "open"
+    }
+  ]
+}

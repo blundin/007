@@ -1,0 +1,6 @@
+# Lint settings for the framework's hooks only. The project's own code uses
+# its own tooling, whatever its language.
+target-version = "py312"
+
+[lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]

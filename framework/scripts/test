@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Runs the named tests and prints each test's outcome, telling a failed test from an errored one. Usage: ./scripts/test <paths>
+# Replace this body with your project's commands. See AGENTS.md, Setup and checks.
+set -euo pipefail
+
+echo "scripts/test is not configured. See AGENTS.md, Setup and checks." >&2
+exit 1

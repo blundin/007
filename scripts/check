@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# 007's single gate: the bootstrap tool (bin/007 and tests/), then the
+# framework's own hook checks, run inside framework/ as a project would.
+# Reuses the hooks' pinned tools and config files.
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+TOOLS=(--no-project --with ruff==0.16.9 --with mypy==2.3.1 --with pytest==9.1.1)
+HOOKS=framework/.claude/hooks
+
+uv run "${TOOLS[@]}" ruff check --config "$HOOKS/ruff.toml" bin/007 tests
+uv run "${TOOLS[@]}" ruff format --check --config "$HOOKS/ruff.toml" bin/007 tests
+uv run "${TOOLS[@]}" mypy --config-file "$HOOKS/mypy.ini" bin/007 tests
+uv run "${TOOLS[@]}" pytest -c "$HOOKS/pytest.ini" -p no:cacheprovider tests "$@"
+
+(cd framework && ./scripts/check-dev-framework)
