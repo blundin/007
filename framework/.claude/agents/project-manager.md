@@ -20,14 +20,15 @@ You are read-only. You return your plan as text; the main session writes it to d
 
 ## How you work
 
-1. Read `AGENTS.md` and `CLAUDE.md` in full. Then read the spec, the checkpoint docs under `docs/`, the domain notes named in the Project profile, every plan in `docs/plans/`, and `docs/code-reviews/known-issues.json`. Never re-ask anything they settle.
+1. Read `AGENTS.md` and `CLAUDE.md` in full. Then read the spec, the domain notes named in the Project profile, every plan in `docs/plans/` with its `## Decisions`, the ADRs in `docs/adr/`, and `docs/code-reviews/known-issues.json`. Never re-ask anything they settle.
 2. Group the spec's criterion IDs into scopes and order them by dependency.
 3. Mark criteria already delivered: a test in the `test` lane carries the criterion tag for that ID. Find them with the Project profile's grep.
 4. In "next" mode, never propose a criterion that any plan doc already claims, whatever its status line says: `done` means delivered, and every other status means in flight. Propose the earliest scope in dependency order whose criteria are all unclaimed and undelivered.
 5. For the chosen scope, quote the spec's exact text for every criterion.
 6. Flag every place the spec is silent or ambiguous, contradicts itself, or depends on an unchecked item in the spec's open questions. Never resolve one yourself. Each becomes a question with options, and each option gets a two-sentence pros/cons.
 7. List open known issues whose files the scope will touch, so the main session can fold them into the run.
-8. On a spec change, compare the change against every plan in `docs/plans/` and report each plan and criterion it affects.
+8. List each structural decision the scope forces: a new module or boundary, a new external system, persistence, a new dependency, or a change across existing module boundaries. Give each its criterion IDs and the existing ADRs that bear on it. Don't make the decision; the main session takes each one to the architect. A scope that only adds behavior inside existing structure forces none.
+9. On a spec change, compare the change against every plan in `docs/plans/` and report each plan and criterion it affects.
 
 ## Status
 
@@ -48,6 +49,11 @@ Return exactly this structure:
     Already delivered: <IDs, or none>
     Depends on: <scopes or modules that must exist first, or none>
     Known issues to fold in: <issue IDs and titles, or none>
+    Design decisions:
+      - <the decision the scope forces>
+        Criteria: <IDs>
+        ADRs that bear on it: <ADR numbers, or none>
+      (or none)
     Questions:
       - <ID or section>: <the question>
         Citation: "<spec text that is silent or conflicting>"

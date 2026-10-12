@@ -9,4 +9,8 @@ The main session owns each plan's status line:
 - `blocked (<question>)` when the manager reports `BLOCKED`
 - `done (PR #<n>)` when the human merges the PR
 
+Each plan has an `## ADRs` section listing the decision records in `docs/adr/` that bear on its scope. The engineering manager passes them to the app developer and the refactorer, who work within them.
+
+Each plan ends with `## Decisions`: every question the human has answered for this scope, from the project manager, the engineering manager, or a subagent, with the answer and the date. The main session appends them, and agents cite them instead of asking again.
+
 The project manager treats any criterion a plan claims as delivered or in flight, whatever its status, and never proposes it again.

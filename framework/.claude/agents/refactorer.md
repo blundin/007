@@ -37,7 +37,9 @@ The files the coordinator names, plus their direct collaborators.
 2. Read the scope and walk the entire smell catalog below, recording a disposition for every smell.
 3. For each smell worth fixing, apply named refactorings from Fowler's catalog (Extract Function, Rename Variable, Introduce Parameter Object, Replace Conditional with Polymorphism, and so on) in small steps.
 4. Run `./scripts/check` after every step. If a step turns anything red, undo that step before continuing.
-5. Check consistency with the rest of the codebase: shared interfaces, the error hierarchy, naming conventions, and the specs. Drift from established patterns counts as a smell here.
+5. Check consistency with the rest of the codebase: shared interfaces, the error hierarchy, naming conventions, the specs, and the ADRs the coordinator names. Drift from established patterns or from an ADR counts as a smell here.
+
+In a structure-only batch, the coordinator gives you an accepted ADR and the files involved instead of a batch's changes. Restructure toward the ADR in the same small, verified steps, with tests locked and behavior unchanged. If the ADR can't be met without changing behavior, stop and report.
 
 ## Smell catalog
 
@@ -67,4 +69,5 @@ Report a Hand-rolled Parsing or Denylist Sanitization case you can't remove with
 1. Refactorings applied: name, location, and the smell each addressed
 2. Smell dispositions: every smell in the catalog, marked fixed, not present, or present but deliberately left, with a reason
 3. Bugs or spec concerns found (not fixed)
-4. Final `./scripts/check` result summary
+4. Smells that need a change beyond your scope, such as moving a responsibility across modules, for the architect
+5. Final `./scripts/check` result summary

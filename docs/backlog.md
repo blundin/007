@@ -6,6 +6,10 @@ IDs continue from the project where the framework was first built, so lessons an
 
 ## Todo
 
+### FW-12 Agents that check each other
+
+Status: `doing`. From an evaluation of how the agents work as a team: the main session verifies the engineering manager's report, the reviewer reviews every feature before its PR, decisions are recorded in each plan's `## Decisions` and reach the agents that need them, conformance tests are derived from the spec before the implementation is read, the architect recommends structure for scopes that set it and is the only author of ADRs, and every agent's tools are guarded and tested. Spec in [`specs/FW-12-agent-teamwork.md`](specs/FW-12-agent-teamwork.md).
+
 ### FW-10 Retrospective after each feature
 
 A fixed step in the done criteria, not a Claude Code hook. After the manager reports `DONE`, the main session reviews the manager's report, the branch's commit history, and the checkpoint doc.
