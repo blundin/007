@@ -1,10 +1,10 @@
 # 007 docs
 
-This folder tracks the framework as its own project: its backlog, lessons, decision records, and specs. Nothing here is copied into projects; what ships is in `framework/`.
+This folder tracks 007 as its own project: the framework in `framework/` and the `bin/007` command that installs and removes it. It holds the backlog, lessons, decision records, and specs. Nothing here is copied into projects; what ships is in `framework/`.
 
 ## Who does framework work
 
-The main session, with the human, driven by items in [`backlog.md`](backlog.md). The triad builds products, not the framework.
+The main session, with the human, driven by items in [`backlog.md`](backlog.md) and working test-first. The triad builds products, not the framework.
 
 ## Files
 
@@ -16,6 +16,7 @@ The main session, with the human, driven by items in [`backlog.md`](backlog.md).
 ## Rules
 
 - Framework changes are proposed, then approved by the human before they land.
-- `framework/.claude/hooks/` and `framework/.claude/settings.json` change only by the human's hand.
+- `framework/.claude/hooks/` and `framework/.claude/settings.json` change only by the human's hand or with the human's explicit approval.
 - Lessons come from evidence: a checkpoint, a manager report, or the human's feedback. Each lesson names its source.
-- `./scripts/check` at the repo root runs every gate, including the hooks' own `framework/scripts/check-dev-framework`.
+- `./scripts/check` at the repo root runs every gate: `bin/007`'s lint, types, and tests, then the hooks' own `framework/scripts/check-dev-framework`.
+- Any change an adopter would notice gets an entry under `Unreleased` in `CHANGELOG.md`.

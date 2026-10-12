@@ -1,6 +1,6 @@
 # Changelog
 
-Changes to `framework/` that an adopter would notice. Versions are git tags; `git diff <old>..<new> -- framework/` shows the full change.
+Changes to `framework/` and `bin/007` that an adopter would notice. Versions are git tags; `git diff <old>..<new> -- framework/` shows the full change.
 
 ## Unreleased
 

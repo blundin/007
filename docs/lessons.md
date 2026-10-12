@@ -18,8 +18,7 @@ Source: FW-01 hook probe, 2026-10-02. Led to: FW-09.
 
 ## Read the deployed source before theorizing
 
-A v2 401 drew two rounds of guesses about Rock permissions. It was settled only by reading Rock's source at the deployed release tag (18.4.1), which showed that v2 accepts the REST key and that a permission denial is also a
-401. Read the source at the deployed tag, and the instance's own `/api/v2/doc`, before proposing a cause. Findings are in `docs/rock-api-notes.md`.
+A v2 401 drew two rounds of guesses about Rock permissions. It was settled only by reading Rock's source at the deployed release tag (18.4.1), which showed that v2 accepts the REST key and that a permission denial is also a 401. Read the source at the deployed tag, and the instance's own `/api/v2/doc`, before proposing a cause. Findings are in `docs/rock-api-notes.md`.
 
 Source: v2 401 investigation, 2026-10-02.
 

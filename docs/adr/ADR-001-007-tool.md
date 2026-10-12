@@ -2,7 +2,9 @@
 
 The tool is named **007**, after the template repo. It installs, configures and updates the framework (the Adversarial TDD Loop) in a project.
 
-**Status:** Accepted, then simplified 2026-10-05 (see Amendment 2). Pending Brian's review of this record **Date:** 2026-10-05 **Deciders:** Brian Lundin
+- **Status:** Accepted, then simplified 2026-10-05 (Amendment 2), and extended with a remove command 2026-10-11 (Amendment 3)
+- **Date:** 2026-10-05
+- **Deciders:** Brian Lundin
 
 ## Context
 
@@ -195,6 +197,18 @@ This replaces Copier (Option C). Option D was rejected because it meant building
 `.007-version` keeps updates possible later.
 
 The spec is [`FW-11-007-tool.md`](../specs/FW-11-007-tool.md).
+
+## Amendment 3 (2026-10-11): remove, and a trustworthy version
+
+The goal is a tool that can install, update, and remove the framework. An audit of v0.1.0 found it could only install, and that `.007-version` could be wrong: it recorded the checkout's `HEAD` but copied the working tree, staged changes included.
+
+**Decision:**
+- Add `007 remove`. It finds the framework files by reading the commit in `.007-version` from 007's own clone, and deletes only files whose contents still match that commit. Files that differ, whether the project changed them or had its own, are kept and listed. This was chosen over an install manifest: there's no new file format, and it works for projects installed with v0.1.0.
+- `new` and `init` refuse while tracked files under `framework/` have uncommitted changes, so `.007-version` always matches what was copied. `remove` depends on that.
+- `init` checks every path before writing, so a file standing where a directory is needed is refused up front instead of leaving a half-finished copy.
+- Distribution stays a git clone, now of the public repo `blundin/007` over HTTPS. The tool reads its own git history, so packaging that drops `.git` (a wheel, a tarball, Homebrew) would break it.
+
+Updates are still not built. Until they are, a project upgrades with `remove`, then `init` from the newer release, and merges the kept files by hand.
 
 ## Sources
 
