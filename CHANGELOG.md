@@ -33,6 +33,9 @@ Changes to `framework/` and `bin/007` that an adopter would notice. Versions are
 - Renamed the "Adversarial TDD Loop" to the "TDD loop" in `CLAUDE.md` and the agent definitions. Adversarial testing is one mode of the test engineer, not the name of the framework.
 - The reviewer's dispatch prompt is now fixed: the commit range, the spec path, and the plan path, never the builders' reports or reasoning. The reviewer doesn't read `docs/code-reviews/` session files, only `known-issues.json`.
 - The reviewer now reads the spec and plan and checks spec conformance: unmet criteria, narrower readings, untagged tests, and unrequested behavior.
+- `lane_guard.py` and `git_guard.py` now block hook input they can't read. Before, they crashed with exit 1, which Claude Code treats as a non-blocking error, so the call went through.
+- `git_guard.py` now catches git run by path, such as `/usr/bin/git commit`.
+- `bin/007 init` now refuses, writing nothing, when `.007-version` already exists. Run `007 remove` first; installing over an older version left files that `remove` couldn't account for.
 - Agents may now edit a spec, but only when a human explicitly directs it and approves the specific change. `AGENTS.md`, `CLAUDE.md`, and `docs/specs/README.md` all say so.
 - Removed the ASCII-only rule for files the test engineer, app developer, and refactorer write, along with its `perl` check. `perl` is no longer a requirement.
 - `.claude/settings.json` now allows `git worktree`, which the loop's Setup step uses, and denies reading `.env` and `.env.*`.

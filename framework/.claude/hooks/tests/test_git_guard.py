@@ -32,6 +32,7 @@ def run_guard(command: str) -> subprocess.CompletedProcess[str]:
         "cd /repo && git -C /repo rev-parse HEAD",
         "git stash list",
         "git -C /repo stash list",
+        "/usr/bin/git status",
     ],
 )
 def test_allows_read_only_subcommand_after_global_options(command: str) -> None:
@@ -55,6 +56,8 @@ def test_allows_read_only_subcommand_after_global_options(command: str) -> None:
         ("git stash list&&git stash drop", "stash"),
         ("git stash list ;git push", "push"),
         ("git status ;git push", "push"),
+        ("/usr/bin/git commit -m x", "commit"),
+        ("git status && /opt/homebrew/bin/git push", "push"),
     ],
 )
 def test_blocks_state_changing_subcommand_and_names_it(
@@ -64,3 +67,20 @@ def test_blocks_state_changing_subcommand_and_names_it(
 
     assert result.returncode == 2
     assert f"`git {subcommand}`" in result.stderr
+
+
+@pytest.mark.parametrize(
+    "payload",
+    ["not json", "[]", '{"tool_input": []}', '{"tool_input": {"command": 1}}'],
+)
+def test_blocks_input_it_cannot_read(payload: str) -> None:
+    result = subprocess.run(
+        [sys.executable, str(GIT_GUARD)],
+        input=payload,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 2
+    assert "Blocked" in result.stderr

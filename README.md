@@ -68,6 +68,7 @@ Run each from the top level of a git repo, except `new`, which makes one.
 - They write `.007-version`, holding the 007 commit they copied from.
 - They refuse to copy while `framework/` in the clone has uncommitted changes, since `.007-version` records the commit, not local edits.
 - They refuse, writing nothing, if a file stands where the framework needs a directory.
+- `init` refuses, writing nothing, if `.007-version` already exists. To upgrade, run `remove` first (see Upgrade a project).
 - They end by printing the setup steps below.
 
 **`remove`** reads the commit in `.007-version` and deletes the framework files that still match that commit. It then deletes `.007-version` and any directories left empty. Files you've changed, such as a filled-in `AGENTS.md`, and files the project had before install are kept and listed. Any clone of this repo has the commit, whatever tag is checked out. It leaves the caches the hooks' tools create (`.mypy_cache`, `.ruff_cache`, `__pycache__`); delete those by hand.

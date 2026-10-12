@@ -27,6 +27,7 @@ Like `rails new`, but small. A developer can put the framework into a new projec
 - **INIT-01**: `007 init` copies every framework file into the current directory. It exits non-zero and writes nothing if the current directory is not the top level of a git repo.
 - **INIT-02**: `007 init` never overwrites an existing file. It lists every path it skipped. For a skipped `CLAUDE.md`, `AGENTS.md`, `.claude/settings.json`, or `.gitignore`, it says what to add by hand.
 - **INIT-03**: `007 init` exits non-zero and writes nothing if a file stands where the framework needs a directory.
+- **INIT-04**: `007 init` exits non-zero and writes nothing if `.007-version` already exists, even as a symlink, and says to run `007 remove` first. Installing over an older install would mix two versions that `remove` can't tell apart.
 - **BOTH-01**: Both commands write `.007-version`, a single line holding the commit of 007's checkout.
 - **BOTH-02**: Both commands end by printing the next steps: set the lanes, fill in the `FILL` markers, write the three scripts, run `./scripts/check-dev-framework`, and commit.
 - **BOTH-03**: Neither command writes outside the target directory, makes a commit, or uses the network.

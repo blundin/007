@@ -263,17 +263,6 @@ def test_init_says_what_to_merge_by_hand_for_a_skipped_shared_file(
     assert str(checkout / "framework" / relative) in result.stdout
 
 
-def test_init_does_not_overwrite_an_existing_version_file(
-    checkout: Path, repo: Path
-) -> None:
-    write_files(repo, {".007-version": "older\n"})
-
-    result = run_007(checkout, repo, "init")
-
-    assert (repo / ".007-version").read_text() == "older\n"
-    assert ".007-version" in result.stdout
-
-
 # BOTH-01
 
 
@@ -420,6 +409,36 @@ def test_init_refuses_a_file_where_a_directory_is_needed(
     assert "docs" in result.stderr
     assert "Traceback" not in result.stderr
     assert all_files(repo) == {"app.py", "docs"}
+
+
+# INIT-04
+
+
+@pytest.mark.parametrize("version", ["older\n", "not a commit\n"])
+def test_init_refuses_when_the_framework_is_already_installed(
+    checkout: Path, repo: Path, version: str
+) -> None:
+    write_files(repo, {".007-version": version})
+
+    result = run_007(checkout, repo, "init")
+
+    assert result.returncode != 0
+    assert "007 remove" in result.stderr
+    assert "Traceback" not in result.stderr
+    assert all_files(repo) == {"app.py", ".007-version"}
+    assert (repo / ".007-version").read_text() == version
+
+
+def test_init_refuses_a_version_file_that_is_a_symlink(
+    checkout: Path, repo: Path
+) -> None:
+    (repo / ".007-version").symlink_to("missing")
+
+    result = run_007(checkout, repo, "init")
+
+    assert result.returncode != 0
+    assert all_files(repo) == {"app.py"}
+    assert (repo / ".007-version").is_symlink()
 
 
 # REMOVE-01

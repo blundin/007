@@ -126,3 +126,24 @@ def test_blocks_relative_path_that_escapes_the_lane(tmp_path: Path) -> None:
     result = run_guard(tmp_path, "src", "lib/../spec/x_spec.rb")
 
     assert result.returncode == 2
+
+
+@pytest.mark.parametrize(
+    "payload",
+    ["not json", "[]", '{"tool_input": []}', '{"tool_input": {"file_path": 1}}'],
+)
+def test_blocks_input_it_cannot_read(tmp_path: Path, payload: str) -> None:
+    write_lanes(tmp_path, json.dumps(LANES))
+    env = {**os.environ, "CLAUDE_PROJECT_DIR": str(tmp_path)}
+
+    result = subprocess.run(
+        [sys.executable, str(LANE_GUARD), "src"],
+        input=payload,
+        capture_output=True,
+        text=True,
+        check=False,
+        env=env,
+    )
+
+    assert result.returncode == 2
+    assert "Blocked" in result.stderr

@@ -24,18 +24,30 @@ READ_ONLY_ACTIONS = {"stash": "list"}
 # separate value makes the value read as the subcommand, which fails closed.
 VALUE_OPTIONS = r"(?:-C|-c|--git-dir|--work-tree|--namespace|--config-env)"
 
-# A `git` word at a command boundary, then any leading options, then the
-# subcommand. The word after it is peeked at, not consumed, so a following
-# `;git` still starts its own match.
+# A `git` word at a command boundary or after a path, as in `/usr/bin/git`,
+# then any leading options, then the subcommand. The word after it is peeked
+# at, not consumed, so a following `;git` still starts its own match.
 GIT_INVOCATION = re.compile(
-    rf"(?:^|[\s;&|(`$'\"])git\s+((?:{VALUE_OPTIONS}\s+\S+\s+|-\S+\s+)*)(\S+)"
+    rf"(?:^|[\s;&|(`$'\"/])git\s+((?:{VALUE_OPTIONS}\s+\S+\s+|-\S+\s+)*)(\S+)"
     r"(?=(?:\s+(\S+))?)"
 )
 
 
+def deny(message: str) -> int:
+    print(f"Blocked: {message}", file=sys.stderr)
+    return 2
+
+
 def main() -> int:
-    payload = json.load(sys.stdin)
-    command = payload.get("tool_input", {}).get("command", "")
+    try:
+        payload = json.load(sys.stdin)
+    except ValueError:
+        return deny("unreadable hook input; refusing the command.")
+
+    tool_input = payload.get("tool_input", {}) if isinstance(payload, dict) else None
+    command = tool_input.get("command", "") if isinstance(tool_input, dict) else None
+    if not isinstance(command, str):
+        return deny("no readable command in the tool input; refusing it.")
 
     for match in GIT_INVOCATION.finditer(command):
         subcommand, action = match.group(2), match.group(3)

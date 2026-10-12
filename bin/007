@@ -134,6 +134,12 @@ def repo_top_level(command: str) -> Path:
 
 def init() -> None:
     target = repo_top_level("init")
+    version_file = target / VERSION_FILE
+    if version_file.is_symlink() or version_file.exists():
+        raise RefusedError(
+            f"{VERSION_FILE} exists, so the framework is already installed;"
+            " run 007 remove first, then 007 init"
+        )
     require_clean_framework()
     copy_framework(target)
 

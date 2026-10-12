@@ -4,7 +4,8 @@
 Each loop subagent declares this hook in its frontmatter and passes its lane,
 `test` or `src`, as the first argument. The paths each lane allows come from
 `.claude/lanes.json`, a map of lane name to path prefixes that end in `/`.
-A missing or invalid lanes file, or an unknown lane, blocks every write.
+A missing or invalid lanes file, an unknown lane, or hook input that cannot be
+read blocks every write.
 
 This guards only file-editing tools. Writes made through Bash are caught by
 the coordinator's diff check, which remains the real backstop.
@@ -36,12 +37,25 @@ def load_lanes(project_dir: Path) -> dict[str, tuple[str, ...]] | None:
     return lanes
 
 
+def deny(message: str) -> int:
+    print(f"Blocked: {message}", file=sys.stderr)
+    return 2
+
+
 def main() -> int:
-    payload = json.load(sys.stdin)
-    tool_input = payload.get("tool_input", {})
+    try:
+        payload = json.load(sys.stdin)
+    except ValueError:
+        return deny("unreadable hook input; refusing the write.")
+
+    tool_input = payload.get("tool_input", {}) if isinstance(payload, dict) else None
+    if not isinstance(tool_input, dict):
+        return deny("no readable tool input; refusing the write.")
     target = tool_input.get("file_path") or tool_input.get("notebook_path")
     if not target:
         return 0
+    if not isinstance(target, str):
+        return deny("the target path is not a string; refusing the write.")
 
     project_dir = Path(os.environ.get("CLAUDE_PROJECT_DIR", os.getcwd())).resolve()
     lanes = load_lanes(project_dir)
