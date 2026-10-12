@@ -4,6 +4,8 @@ Changes to `framework/` and `bin/007` that an adopter would notice. Versions are
 
 ## Unreleased
 
+- `CLAUDE.md` says the `git reset` that splits a struggling batch raises a permission prompt on purpose, since it discards commits.
+
 ## v1.0.0 (2026-10-12)
 
 The baseline release. Earlier history was folded into this one commit, so `.007-version` files from before it no longer resolve: reinstall those projects from v1.0.0.
