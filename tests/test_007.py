@@ -362,3 +362,190 @@ def test_init_refuses_a_dangling_symlink_that_leads_outside_the_repo(
 
     assert not target.exists()
     assert "CLAUDE.md" in result.stdout + result.stderr
+
+
+# BOTH-04
+
+
+@pytest.mark.parametrize("command", ["new", "init"])
+def test_refuses_a_framework_file_with_uncommitted_changes(
+    checkout: Path, repo: Path, tmp_path: Path, command: str
+) -> None:
+    (checkout / "framework" / "AGENTS.md").write_text("an uncommitted edit\n")
+
+    if command == "new":
+        result = run_007(checkout, tmp_path, "new", "myapp")
+        assert not (tmp_path / "myapp").exists()
+    else:
+        result = run_007(checkout, repo, "init")
+        assert all_files(repo) == {"app.py"}
+
+    assert result.returncode != 0
+    assert "uncommitted" in result.stderr
+
+
+def test_init_refuses_a_staged_framework_file(checkout: Path, repo: Path) -> None:
+    write_files(checkout / "framework", {".claude/agents/new.md": "staged\n"})
+    git(checkout, "add", "framework/.claude/agents/new.md")
+
+    result = run_007(checkout, repo, "init")
+
+    assert result.returncode != 0
+    assert all_files(repo) == {"app.py"}
+
+
+def test_init_ignores_uncommitted_changes_outside_the_framework(
+    checkout: Path, repo: Path
+) -> None:
+    (checkout / "README.md").write_text("an uncommitted edit\n")
+    write_files(checkout / "framework", {"notes.txt": "untracked\n"})
+
+    result = run_007(checkout, repo, "init")
+
+    assert result.returncode == 0, result.stderr
+    assert not (repo / "notes.txt").exists()
+
+
+# INIT-03
+
+
+def test_init_refuses_a_file_where_a_directory_is_needed(
+    checkout: Path, repo: Path
+) -> None:
+    write_files(repo, {"docs": "notes\n"})
+
+    result = run_007(checkout, repo, "init")
+
+    assert result.returncode != 0
+    assert "docs" in result.stderr
+    assert "Traceback" not in result.stderr
+    assert all_files(repo) == {"app.py", "docs"}
+
+
+# REMOVE-01
+
+
+@pytest.fixture
+def installed(checkout: Path, repo: Path) -> Path:
+    run_007(checkout, repo, "init")
+    return repo
+
+
+def test_remove_deletes_every_unchanged_framework_file_and_the_version_file(
+    checkout: Path, installed: Path
+) -> None:
+    result = run_007(checkout, installed, "remove")
+
+    assert result.returncode == 0, result.stderr
+    assert all_files(installed) == {"app.py"}
+
+
+def test_remove_deletes_the_directories_it_empties_and_keeps_the_rest(
+    checkout: Path, installed: Path
+) -> None:
+    write_files(installed, {"scripts/deploy": "the project's own\n"})
+
+    run_007(checkout, installed, "remove")
+
+    assert not (installed / ".claude").exists()
+    assert not (installed / "docs").exists()
+    assert (installed / "scripts" / "deploy").read_text() == "the project's own\n"
+
+
+def test_remove_makes_no_commit(checkout: Path, installed: Path) -> None:
+    before = git(installed, "rev-parse", "HEAD").stdout
+
+    run_007(checkout, installed, "remove")
+
+    assert git(installed, "rev-parse", "HEAD").stdout == before
+
+
+# REMOVE-02
+
+
+def test_remove_keeps_and_lists_files_changed_since_install(
+    checkout: Path, installed: Path
+) -> None:
+    write_files(installed, {"AGENTS.md": "# myapp\n", "scripts/check": "make\n"})
+
+    result = run_007(checkout, installed, "remove")
+
+    assert result.returncode == 0, result.stderr
+    assert all_files(installed) == {"app.py", "AGENTS.md", "scripts/check"}
+    assert "AGENTS.md" in result.stdout
+    assert "scripts/check" in result.stdout
+
+
+def test_remove_keeps_a_file_the_project_had_before_install(
+    checkout: Path, repo: Path
+) -> None:
+    write_files(repo, {"CLAUDE.md": "the project's own\n"})
+    run_007(checkout, repo, "init")
+
+    run_007(checkout, repo, "remove")
+
+    assert (repo / "CLAUDE.md").read_text() == "the project's own\n"
+
+
+def test_remove_compares_against_the_installed_commit_not_the_current_one(
+    checkout: Path, installed: Path
+) -> None:
+    (checkout / "framework" / "AGENTS.md").write_text("# a newer release\n")
+    git(checkout, "commit", "-q", "-am", "newer 007")
+
+    run_007(checkout, installed, "remove")
+
+    assert all_files(installed) == {"app.py"}
+
+
+# REMOVE-03
+
+
+def test_remove_refuses_without_a_version_file(checkout: Path, repo: Path) -> None:
+    result = run_007(checkout, repo, "remove")
+
+    assert result.returncode != 0
+    assert ".007-version" in result.stderr
+
+
+@pytest.mark.parametrize("version", ["0" * 40, "--help", "not a commit"])
+def test_remove_refuses_a_commit_the_checkout_does_not_have(
+    checkout: Path, installed: Path, version: str
+) -> None:
+    (installed / ".007-version").write_text(version + "\n")
+    before = all_files(installed)
+
+    result = run_007(checkout, installed, "remove")
+
+    assert result.returncode != 0
+    assert all_files(installed) == before
+
+
+def test_remove_refuses_below_the_top_level_of_a_repo(
+    checkout: Path, installed: Path
+) -> None:
+    sub = installed / "sub"
+    sub.mkdir()
+    for relative in [".007-version", "AGENTS.md"]:
+        shutil.copy2(installed / relative, sub / relative)
+    before = all_files(installed)
+
+    result = run_007(checkout, sub, "remove")
+
+    assert result.returncode != 0
+    assert all_files(installed) == before
+
+
+def test_remove_refuses_a_symlink_that_leads_outside_the_repo(
+    checkout: Path, installed: Path, tmp_path: Path
+) -> None:
+    outside = tmp_path / "outside"
+    shutil.move(installed / ".claude", outside)
+    (installed / ".claude").symlink_to(outside)
+    outside_before = all_files(outside)
+
+    result = run_007(checkout, installed, "remove")
+
+    assert result.returncode != 0
+    assert all_files(outside) == outside_before
+    assert (installed / "AGENTS.md").exists()
