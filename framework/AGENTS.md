@@ -74,6 +74,6 @@ Every agent reads this section. Fill in each item; the examples show what a Pyth
 - **Runtime dependencies:** <!-- FILL. Example: httpx and Pydantic only. -->
 - **Test isolation:** <!-- FILL: the HTTP mocking tool and the property-testing library, if any. Example: respx; Hypothesis. -->
 - **Property-testing targets:** <!-- FILL: properties the test-engineer must cover with generated input, or "none". Example: no generated string can escape its literal in the compiled filter expression. -->
-- **Domain attacks:** <!-- FILL: project-specific attack categories for the test-engineer, or "none". Example: the upstream API returns 401 with an empty body, not 403, for a key that lacks permission. -->
+- **Domain attacks:** <!-- FILL: project-specific attack categories for the test-engineer, or "none". Example, for an HTTP client: HTTP failures (401 versus 403, 404, 400 with error bodies, 429 with and without Retry-After, 5xx, timeouts, malformed JSON, empty bodies, HTML error pages); retries (non-idempotent requests are never retried, others only where the spec says it's safe); pagination (empty results, counts that change mid-iteration, the last page); and the upstream API returning 401 with an empty body, not 403, for a key that lacks permission. -->
 - **Domain notes:** <!-- FILL: path to verified behavior of external systems, or "none". Example: docs/upstream-api-notes.md -->
 - **Threat model:** <!-- FILL: who the adversarial tests defend against, or the spec section that says. Example: docs/specs/PRD.md, Threat model. -->

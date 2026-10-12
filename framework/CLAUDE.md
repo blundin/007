@@ -34,7 +34,11 @@ If anything doesn't match, resume the manager with the discrepancy. Never presen
 
 ### Review before the PR
 
-After a verified `DONE`, dispatch `reviewer`. The reviewer's value is that it hasn't seen how the change was built, so its prompt carries exactly three things and nothing else: the commit range (`main..HEAD`, or the new commits on a re-review), the spec path, and the plan path. Never add the manager's report, the triad's reports, your own summary, or why the code was written the way it was. The reviewer returns findings without writing them; record them with the `review-tracker` skill, mapping its severities as `reviewer.md` says.
+After a verified `DONE`, dispatch `reviewer`. The reviewer's value is that it hasn't seen how the change was built, so its prompt carries exactly three things and nothing else: the commit range (`main..HEAD`, or the new commits on a re-review), the spec path, and the plan path. Never add the manager's report, the triad's reports, your own summary, or why the code was written the way it was. The reviewer runs once per scope, here; don't dispatch it after individual batches or phases.
+
+The reviewer writes nothing, and only its prompt stops it writing through Bash, so run the diff check (below) after it returns. Any change at all is a violation: restore it, discard that review, and dispatch the reviewer again with a notice naming the violation. Two in a row go to the human.
+
+The reviewer returns findings without writing them; record them with the `review-tracker` skill, mapping its severities as `reviewer.md` says.
 
 - Findings the reviewer marks `design` go to `architect`, not to the manager as RED targets; a test can't express a wrong abstraction. Handle them as design questions (see Triage). If the human accepts a structural change, send the manager the accepted ADR and the finding IDs for a structure-only batch.
 - Triage every other Blocker and Major against the threat model, as for sweep findings. Send the ones that stand back to the manager as targets for a new batch, with their finding IDs.

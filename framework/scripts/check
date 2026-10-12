@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # The full gate the TDD loop treats as GREEN: lint, format, strict types, every test, and coverage. Extra arguments pass through to the test runner.
-# Replace this body with your project's commands. See README.md, Adopting.
+# Replace this body with your project's commands. See AGENTS.md, Setup and checks.
 set -euo pipefail
 
-echo "scripts/check is not configured. See README.md, Adopting." >&2
+echo "scripts/check is not configured. See AGENTS.md, Setup and checks." >&2
 exit 1

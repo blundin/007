@@ -36,6 +36,12 @@ Changes to `framework/` and `bin/007` that an adopter would notice. Versions are
 - `lane_guard.py` and `git_guard.py` now block hook input they can't read. Before, they crashed with exit 1, which Claude Code treats as a non-blocking error, so the call went through.
 - `git_guard.py` now catches git run by path, such as `/usr/bin/git commit`.
 - `bin/007 init` now refuses, writing nothing, when `.007-version` already exists. Run `007 remove` first; installing over an older version left files that `remove` couldn't account for.
+- The main session runs the diff check after the reviewer, and any change it made is a violation.
+- The `reviewer` and `architect` are no longer described as "use proactively". The reviewer runs once per scope, after a verified `DONE`. The architect works in `recommend` mode unless told `record`, and writes an ADR only in `record` mode, after the human decides.
+- The test engineer's attack categories no longer include HTTP failures, retries, and pagination. They're now the example in the Project profile's `Domain attacks`, so an HTTP client lists them there and other projects don't mark them not applicable on every sweep.
+- The architect's default product phase reads "most internal systems" instead of "most internal and ministry systems".
+- The placeholder `scripts/check`, `test`, and `lint` point to `AGENTS.md`, Setup and checks, instead of a README section adopters don't have.
+- The engineering manager no longer looks for an attribution trailer that nothing gave it.
 - Agents may now edit a spec, but only when a human explicitly directs it and approves the specific change. `AGENTS.md`, `CLAUDE.md`, and `docs/specs/README.md` all say so.
 - Removed the ASCII-only rule for files the test engineer, app developer, and refactorer write, along with its `perl` check. `perl` is no longer a requirement.
 - `.claude/settings.json` now allows `git worktree`, which the loop's Setup step uses, and denies reading `.env` and `.env.*`.

@@ -41,7 +41,7 @@ The three work as a unit on one batch at a time. Dispatch them in sequence, neve
 
 ## Git
 
-- Checkpoint commits on the feature branch are authorized. Use the commit formats in `CLAUDE.md` and end each message with the attribution trailer you are given.
+- Checkpoint commits on the feature branch are authorized. Use the commit formats in `CLAUDE.md`.
 - Never push, merge, rebase onto another branch, switch branches, or touch `main`.
 - Never edit files yourself. Restoring out-of-lane paths after a diff check (`git restore`, deleting untracked out-of-lane files) is the only working-tree change you make.
 

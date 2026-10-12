@@ -6,10 +6,6 @@ IDs continue from the project where the framework was first built, so lessons an
 
 ## Todo
 
-### FW-12 Agents that check each other
-
-Status: `doing`. From an evaluation of how the agents work as a team: the main session verifies the engineering manager's report, the reviewer reviews every feature before its PR, decisions are recorded in each plan's `## Decisions` and reach the agents that need them, conformance tests are derived from the spec before the implementation is read, the architect recommends structure for scopes that set it and is the only author of ADRs, and every agent's tools are guarded and tested. Spec in [`specs/FW-12-agent-teamwork.md`](specs/FW-12-agent-teamwork.md).
-
 ### FW-10 Retrospective after each feature
 
 A fixed step in the done criteria, not a Claude Code hook. After the manager reports `DONE`, the main session reviews the manager's report, the branch's commit history, and the checkpoint doc.
@@ -26,6 +22,16 @@ An agent that works this backlog: records lessons, writes framework specs, and p
 
 The reviewer runs on the same model family that wrote the code, so they share blind spots. An optional second review on a different model (for example through Codex) would give real independence. Opt-in per project; the Claude reviewer stays the default. Decide first whether its findings merge into the same `review-tracker` session or stay separate. This is the one place tool neutrality earns its cost; the rest of the framework stays optimized for Claude Code.
 
+### FW-14 FW-12 follow-ups
+
+Items FW-12 deferred (see its Out of scope). Each becomes its own item when it starts to cost something.
+
+- 4a: the cost of the refactor pass after every batch.
+- 4b: resuming the engineering manager in place instead of re-dispatching it.
+- 4c: cheaper models for agents that don't need Opus.
+- 4d: the diff check ignores gitignored files, so an agent can write there unseen.
+- 3b: ownership lines between the refactorer, reviewer, and architect. The once-per-scope reviewer and recommend-by-default architect narrowed this.
+
 ### FW-02 Engineering manager, phase 2: parallel triads
 
 Up to three triads, each in its own git worktree and branch, merged by the manager after `./scripts/check` passes. Start only after the single-triad loop has run a feature cleanly in this project.
@@ -33,6 +39,10 @@ Up to three triads, each in its own git worktree and branch, merged by the manag
 Known blocker: `lane_guard.py` resolves paths against `$CLAUDE_PROJECT_DIR` and blocks anything outside it, so a triad writing in a separate worktree would be blocked or checked against the wrong tree. Hook changes are the human's to make.
 
 ## Done
+
+### FW-12 Agents that check each other
+
+Status: `done` (PR #3). Follow-ups came in PR #4 and the audit fixes after it; the items it deferred are FW-14. From an evaluation of how the agents work as a team: the main session verifies the engineering manager's report, the reviewer reviews every feature before its PR, decisions are recorded in each plan's `## Decisions` and reach the agents that need them, conformance tests are derived from the spec before the implementation is read, the architect recommends structure for scopes that set it and is the only author of ADRs, and every agent's tools are guarded and tested. Spec in [`specs/FW-12-agent-teamwork.md`](specs/FW-12-agent-teamwork.md).
 
 ### FW-11 007 bootstrap tool
 

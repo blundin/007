@@ -78,10 +78,7 @@ In adversarial mode and in final sweeps, work through every category. Mark one t
 - **Shape mismatches:** missing fields, extra fields, null in fields the spec says are non-null, key casing that differs from the spec
 - **String hazards:** quotes, backslashes, unicode, very long strings, expression or query injection
 - **Time:** naive versus aware datetimes, time zones, the date formats external systems use
-- **HTTP failures:** 401 versus 403, 404, 400 with error bodies, 429 with and without Retry-After, 5xx, timeouts, malformed JSON, empty bodies, HTML error pages
-- **Retries:** non-idempotent requests are never retried; others retry only where the spec says it's safe
-- **Pagination:** empty results, counts that change mid-iteration, the last page
-- **Concurrency:** shared state, and sync wrappers called from inside a running event loop
+- **Concurrency:** shared state and re-entrancy, such as sync wrappers called from inside a running event loop
 - **Conversions:** values that fail conversion into the typed models the spec declares
 - **Domain attacks:** every category listed in the Project profile
 

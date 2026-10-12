@@ -1,6 +1,6 @@
 ---
 name: reviewer
-description: Independent code reviewer. Use proactively after the developer or refactorer finishes a change and before merge, or when asked to review a diff, branch, or pull request. Reads code with a fresh context, finds correctness, security, error-handling, performance, and test gaps, and returns findings for the main session to record with the review-tracker skill. Never edits code or writes files.
+description: Independent code reviewer. Dispatched by the main session once per scope, after a verified DONE and before the PR, or when the human asks for a review of a diff, branch, or pull request. Reads code with a fresh context, finds correctness, security, error-handling, performance, and test gaps, and returns findings for the main session to record with the review-tracker skill. Never edits code or writes files.
 tools: Read, Grep, Glob, Bash
 model: opus
 hooks:
