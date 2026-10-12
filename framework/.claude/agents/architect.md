@@ -5,7 +5,7 @@ tools: Read, Grep, Glob, Write, Edit, WebFetch, WebSearch
 model: opus
 hooks:
   PreToolUse:
-    - matcher: "Write|Edit"
+    - matcher: "Write|Edit|MultiEdit|NotebookEdit"
       hooks:
         - type: command
           command: python3 "$CLAUDE_PROJECT_DIR/.claude/hooks/adr_write_guard.py"
@@ -104,6 +104,11 @@ State the disagreement when it bears on the task, then apply the default.
 4. Recommend exactly one option, state why, and name the force that would change your answer.
 5. Draft an ADR. Fill the Confirmation field with a fitness function, an objective check on an architectural characteristic (a dependency-rule test, a latency budget in CI, a limit on synchronous call depth). If no objective check is feasible, write "manual review at <trigger>."
 6. Write the ADR to `docs/adr/` only when the user asked for a decision record, or when your recommendation is final and the task was a decision. Otherwise return the draft as text.
+
+In the project's loop, the main session dispatches you in one of two modes, named in the prompt:
+
+- `recommend`: a structural decision a scope forces, a design question, or a design finding from review. Run the workflow and return the options, your recommendation, and the draft ADR as text. Write nothing; the human hasn't decided yet.
+- `record`: the human's decision on an earlier recommendation. Write the ADR with status `accepted`, recording the option the human chose, even if it differs from yours, and the reasons given. Report the file you wrote.
 
 In review mode, read the code before commenting, cite file and line, and rank findings by the cost of changing them later.
 

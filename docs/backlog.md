@@ -8,7 +8,7 @@ IDs continue from the project where the framework was first built, so lessons an
 
 ### FW-12 Agents that check each other
 
-Status: `doing`. From an evaluation of how the agents work as a team: the main session verifies the engineering manager's report, the reviewer reviews every feature before its PR, decisions are recorded in each plan's `## Decisions` and reach the agents that need them, conformance tests are derived from the spec before the implementation is read, and design questions go to the architect before the human. Spec in [`specs/FW-12-agent-teamwork.md`](specs/FW-12-agent-teamwork.md).
+Status: `doing`. From an evaluation of how the agents work as a team: the main session verifies the engineering manager's report, the reviewer reviews every feature before its PR, decisions are recorded in each plan's `## Decisions` and reach the agents that need them, conformance tests are derived from the spec before the implementation is read, the architect recommends structure for scopes that set it and is the only author of ADRs, and every agent's tools are guarded and tested. Spec in [`specs/FW-12-agent-teamwork.md`](specs/FW-12-agent-teamwork.md).
 
 ### FW-10 Retrospective after each feature
 

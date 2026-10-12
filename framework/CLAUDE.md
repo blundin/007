@@ -10,8 +10,8 @@ The main session delegates. It plans each scope with `project-manager` before bu
 
 1. Dispatch `project-manager` with the spec path and either a requested scope or "next". Dispatch it when the human asks what's next or asks to start a scope; when the engineering manager reports `DONE` and the human has merged its PR (run "next"); and when the human changes a spec or answers one of its open questions.
 2. On `BLOCKED`, relay the PM's questions to the human and resume the PM with the answers. Spec changes are the human's to make. A question about design goes to `architect` first (see Triage).
-3. In "next" mode, present the proposed scope, its order rationale, and any questions to the human, and wait for approval. A changed scope goes back to the PM as a requested scope. Never build a proposal without approval.
-4. On `READY` (and approval), create the feature branch, write the plan to `docs/plans/<scope>.md` with `Status: planned` and a closing `## Decisions` section, and commit it.
+3. If the PM's `Design decisions` isn't `none`, dispatch `architect` in `recommend` mode for each decision before going further. In either mode, present those recommendations and wait for the human to decide each one. In "next" mode, present the proposed scope, its order rationale, any questions, and the architect's recommendations to the human, and wait for approval. A changed scope goes back to the PM as a requested scope. Never build a proposal without approval.
+4. On `READY` (and approval), create the feature branch. For each design decision the human made, dispatch `architect` in `record` mode to write the accepted ADR. Write the plan to `docs/plans/<scope>.md` with `Status: planned`, an `## ADRs` section listing every ADR that bears on the scope (new ones and those the PM named), and a closing `## Decisions` section. Commit the ADRs and the plan together.
 
 Whenever the human answers a question, from the PM, the engineering manager, or a subagent, the main session appends it to that plan's `## Decisions`: the question, the answer, and the date. Answers given while planning go in when the plan is first written; later ones are committed on the feature branch before anyone is resumed. Agents cite these decisions instead of asking again.
 
@@ -27,7 +27,7 @@ The manager's report is a claim. Before treating it as done, the main session ch
 
 1. `./scripts/check` passes.
 2. The Project profile's criterion grep finds a tagged test for every ID under `Criteria covered`, and the scope has no other IDs left.
-3. `git log` on the branch shows, for each batch in the report, a `test(red)` checkpoint before its `feat(green)` checkpoint.
+3. `git log` on the branch shows, for each batch in the report, a `test(red)` checkpoint before its `feat(green)` checkpoint. A structure-only batch has a `refactor` checkpoint instead.
 4. HEAD matches the report.
 
 If anything doesn't match, resume the manager with the discrepancy. Never present an unverified report to the human as done.
@@ -36,9 +36,16 @@ If anything doesn't match, resume the manager with the discrepancy. Never presen
 
 After a verified `DONE`, dispatch `reviewer` on the branch's diff against `main`, with the spec and plan paths. The reviewer returns findings without writing them; record them with the `review-tracker` skill, mapping its severities as `reviewer.md` says.
 
-- Triage each Blocker and Major against the threat model, as for sweep findings. Send the ones that stand back to the manager as targets for a new batch, with their finding IDs.
+- Findings the reviewer marks `design` go to `architect`, not to the manager as RED targets; a test can't express a wrong abstraction. Handle them as design questions (see Triage). If the human accepts a structural change, send the manager the accepted ADR and the finding IDs for a structure-only batch.
+- Triage every other Blocker and Major against the threat model, as for sweep findings. Send the ones that stand back to the manager as targets for a new batch, with their finding IDs.
 - After that run is verified, dispatch the reviewer again on the new commits only. If a Blocker remains, escalate to the human.
-- Minors and Nits are recorded and listed in the PR description; they don't block it.
+- Minors and Nits are recorded as `acknowledged` and listed in the PR description; they don't block it.
+
+Finding statuses follow triage. A finding sent to a batch stays `open` until the batch lands, then becomes `fixed` with its commit sha in the resolution notes. A finding triaged out becomes `wont-fix`, with the reason in its resolution notes.
+
+### Open the PR
+
+When the review is settled, the main session opens the PR. The description lists the criteria delivered, the ADRs written, the reviewer's Minors and Nits, and every finding triaged out with its reason.
 
 ### The coordinator
 
@@ -57,12 +64,14 @@ The `engineering-manager` is the coordinator. Throughout this loop, "you" means 
 
 ## Lanes
 
-Each subagent's lane is enforced by hooks in its own definition under `.claude/agents/`, which run only while that subagent is active. You, the coordinator, are not restricted by them.
+Each subagent's lane is enforced by hooks in its own definition under `.claude/agents/`, which run only while that subagent is active. They don't restrict you, the coordinator, except the agent guard below.
 
 - `.claude/hooks/lane_guard.py` blocks Write and Edit calls outside the subagent's lane.
 - `.claude/hooks/git_guard.py` blocks every git command except read-only ones (`status`, `diff`, `log`, `show`, `ls-files`, `grep`, `blame`, `rev-parse`, and `stash list`). Git state belongs to you.
 
-Neither hook can see everything a subagent does through Bash, so the diff check below is the real backstop. Never skip it.
+The `reviewer` runs `git_guard.py` too. Your own `Agent` tool runs `.claude/hooks/agent_guard.py`, which lets you dispatch only the triad: any other agent would work outside every lane.
+
+Neither lane hook can see everything a subagent does through Bash, so the diff check below is the real backstop. Never skip it.
 
 ## Diff check (after every dispatch)
 
@@ -103,7 +112,7 @@ Commit pins first, if any: `test: pin <criterion IDs> guards`. Then commit the f
 
 ### 3. GREEN
 
-Dispatch `app-developer` with the failing test paths, the failure output, the spec, and `docs/code-reviews/known-issues.json`, naming which findings this batch targets and which are already fixed. Verify:
+Dispatch `app-developer` with the failing test paths, the failure output, the spec, the ADRs listed in the plan, and `docs/code-reviews/known-issues.json`, naming which findings this batch targets and which are already fixed. Verify:
 
 - Diff check passes.
 - The diff meets the code rules in AGENTS.md, including a full `./scripts/check`. A passing new test is not enough.
@@ -112,7 +121,7 @@ Commit: `feat(green): <criterion IDs>`.
 
 ### 4. REFACTOR
 
-Dispatch `refactorer` with the files changed in this batch. Verify:
+Dispatch `refactorer` with the files changed in this batch and the ADRs listed in the plan. Verify:
 
 - Diff check passes, and no file in the `test` lane changed.
 - `./scripts/check` passes in full.
@@ -121,10 +130,14 @@ Dispatch `refactorer` with the files changed in this batch. Verify:
 
 Commit: `refactor: <summary>` (skip the commit if nothing changed, but the report is still required).
 
+### Structure-only batch (design runs only)
+
+When the main session sends an accepted ADR to bring the code in line with, dispatch `refactorer` with the ADR, the finding IDs it resolves, and the files involved. It restructures toward the ADR with tests locked. Verify as for REFACTOR, and also that the change matches the ADR. Commit: `refactor: <ADR number> <summary>`. There is no RED or GREEN: behavior doesn't change. If the ADR can't be met without changing behavior, stop and escalate; that's a spec question.
+
 ## Triage (before a finding or question becomes work)
 
 - **Spec questions.** When a subagent raises one, first check the spec and the `## Decisions` sections of the plans in `docs/plans/`. If their text settles it, re-dispatch the subagent with that text quoted. That is citing, not resolving. Escalate only what the text leaves open.
-- **Design questions.** A question about structure (module boundaries, a pattern, a new abstraction, a dependency choice), as opposed to what the spec requires, goes to `architect` before the human. Dispatch it with the question and the code it touches, then present its recommendation along with the question. The human decides. An accepted recommendation becomes an ADR in `docs/adr/`, and the decision is recorded in the plan.
+- **Design questions.** A question about structure (module boundaries, a pattern, a new abstraction, a dependency choice), as opposed to what the spec requires, goes to `architect` before the human. Dispatch it in `recommend` mode with the question and the code it touches, then present its recommendation along with the question. The human decides. Then dispatch it in `record` mode with the decision, so it writes the accepted ADR, and commit the ADR with the plan's `## ADRs` and `## Decisions` updated.
 - **Adversarial findings.** Before a sweep finding becomes a RED target, judge it against the threat model in the Project profile, using the test-engineer's "Realistic?" answer. A finding no real caller or upstream system could produce is not pursued: report it as `info` with disposition `triaged out` and the reason, so the human sees every one.
 
 ## Batch scaling
@@ -147,5 +160,6 @@ A feature is done when the done rules in AGENTS.md hold, and also:
 Anything in AGENTS.md's "Stop and ask a human" list comes up, or:
 
 - A subagent raises a spec question that triage doesn't settle. Pause the loop and ask; never resolve it yourself.
+- A batch needs a structural decision that the plan's ADRs and the existing structure don't settle, such as a new module boundary, or the refactorer reports a smell that needs a change beyond its scope. Report it; the main session takes it to the architect.
 - Two consecutive lane violations by the same subagent.
 - The feature exceeds 12 batches.

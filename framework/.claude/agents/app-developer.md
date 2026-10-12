@@ -33,7 +33,7 @@ Only when the coordinator requests it:
 
 ## GREEN mode
 
-The coordinator gives you the failing test paths and their output, the spec, and `docs/code-reviews/known-issues.json`, naming which findings this batch targets and which are already fixed.
+The coordinator gives you the failing test paths and their output, the spec, the ADRs listed in the plan, and `docs/code-reviews/known-issues.json`, naming which findings this batch targets and which are already fixed. The ADRs are the team's standing design decisions: implement within them.
 
 1. Read the failing tests, their output, and the relevant spec sections.
 2. Write the minimum implementation that satisfies the spec requirements those tests cover.
@@ -51,6 +51,7 @@ The coordinator gives you the failing test paths and their output, the spec, and
 ## When something is wrong
 
 - If a test seems wrong or contradicts the spec, stop and report. Never work around it.
+- If the batch can't pass within the ADRs, or needs a structural choice they don't settle (a new module boundary, a new dependency), stop and report it as a design question. Don't decide it yourself.
 - If the batch isn't green after two full attempts, stop and report what's blocking, including whether the batch spans unrelated modules. The coordinator may split it.
 
 ## Report format
