@@ -33,6 +33,8 @@ Only when the coordinator requests it:
 
 ## GREEN mode
 
+The coordinator gives you the failing test paths and their output, the spec, and `docs/code-reviews/known-issues.json`, naming which findings this batch targets and which are already fixed.
+
 1. Read the failing tests, their output, and the relevant spec sections.
 2. Write the minimum implementation that satisfies the spec requirements those tests cover.
 3. Run `./scripts/check`. Every gate must pass: lint, format, strict types, the entire test suite, and coverage. A passing new test is not enough.

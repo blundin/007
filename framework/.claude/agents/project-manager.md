@@ -20,7 +20,7 @@ You are read-only. You return your plan as text; the main session writes it to d
 
 ## How you work
 
-1. Read `AGENTS.md` and `CLAUDE.md` in full. Then read the spec, the checkpoint docs under `docs/`, the domain notes named in the Project profile, every plan in `docs/plans/`, and `docs/code-reviews/known-issues.json`. Never re-ask anything they settle.
+1. Read `AGENTS.md` and `CLAUDE.md` in full. Then read the spec, the domain notes named in the Project profile, every plan in `docs/plans/` with its `## Decisions`, and `docs/code-reviews/known-issues.json`. Never re-ask anything they settle.
 2. Group the spec's criterion IDs into scopes and order them by dependency.
 3. Mark criteria already delivered: a test in the `test` lane carries the criterion tag for that ID. Find them with the Project profile's grep.
 4. In "next" mode, never propose a criterion that any plan doc already claims, whatever its status line says: `done` means delivered, and every other status means in flight. Propose the earliest scope in dependency order whose criteria are all unclaimed and undelivered.

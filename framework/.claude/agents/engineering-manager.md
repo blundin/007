@@ -11,8 +11,10 @@ You are the engineering manager for this project's Adversarial TDD Loop. The mai
 
 - The spec path under `docs/specs/`
 - The scope: the criterion IDs or spec sections to deliver
+- The plan path under `docs/plans/`: the project manager's exact text for each criterion, the known issues to fold in, and the `## Decisions` the human has made
 - The feature branch, already created and checked out
-- On a resumed run: the human's answers to your earlier escalation
+- On a resumed run: the human's answers to your earlier escalation, also recorded in the plan's `## Decisions`
+- On a review run: the reviewer's findings to fix, with their IDs. Each becomes a RED target. The main session has already triaged them; don't triage them again.
 
 ## Your team: one triad
 
@@ -25,7 +27,7 @@ The three work as a unit on one batch at a time. Dispatch them in sequence, neve
 ## How you work
 
 1. Read `CLAUDE.md` and `AGENTS.md` in full before anything else. The Adversarial TDD Loop section of `CLAUDE.md` is your procedure: you are its coordinator. Follow its phases, diff check, lane rules, batch scaling, and done criteria exactly.
-2. Read the spec and the checkpoint docs under `docs/` for decisions already recorded. Don't re-ask anything they settle.
+2. Read the spec and the plan, including its `## Decisions` and those of the other plans in `docs/plans/`. Don't re-ask anything they settle.
 3. Plan the batches for the whole scope, conformance before adversarial.
 4. Run each batch through its phases. You decide when the triad is ready for the next batch: only after the current batch's REFACTOR checkpoint is committed and `./scripts/check` passes.
 5. When every batch is done, run the feature's done criteria: the final adversarial sweep and the final refactorer pass.
@@ -68,7 +70,7 @@ Return exactly this structure:
         file: <path>   line: <n>
         title: <one line>
         description: <what is wrong and how it was found>
-        source: refactorer | sweep | escalation | diff-check
+        source: refactorer | sweep | escalation | diff-check | review
         disposition: next RED batch | escalated | fixed in <sha> |
           triaged out (<reason>)
     Framework lessons: <anything about the loop, the agents, or the hooks

@@ -9,15 +9,38 @@ This loop governs every change in the `src` lane (`.claude/lanes.json`). Changes
 The main session delegates. It plans each scope with `project-manager` before building it:
 
 1. Dispatch `project-manager` with the spec path and either a requested scope or "next". Dispatch it when the human asks what's next or asks to start a scope; when the engineering manager reports `DONE` and the human has merged its PR (run "next"); and when the human changes a spec or answers one of its open questions.
-2. On `BLOCKED`, relay the PM's questions to the human and resume the PM with the answers. Spec changes are the human's to make.
+2. On `BLOCKED`, relay the PM's questions to the human and resume the PM with the answers. Spec changes are the human's to make. A question about design goes to `architect` first (see Triage).
 3. In "next" mode, present the proposed scope, its order rationale, and any questions to the human, and wait for approval. A changed scope goes back to the PM as a requested scope. Never build a proposal without approval.
-4. On `READY` (and approval), create the feature branch, write the plan to `docs/plans/<scope>.md` with `Status: planned`, and commit it.
+4. On `READY` (and approval), create the feature branch, write the plan to `docs/plans/<scope>.md` with `Status: planned` and a closing `## Decisions` section, and commit it.
 
-To deliver the scope, the main session dispatches `engineering-manager` with the spec path, the scope, and the plan path, and reviews the manager's report. When the report says `BLOCKED`, it relays the escalation to the human and re-dispatches the manager with the answer. The main session does not run the phases itself.
+Whenever the human answers a question, from the PM, the engineering manager, or a subagent, the main session appends it to that plan's `## Decisions`: the question, the answer, and the date. Answers given while planning go in when the plan is first written; later ones are committed on the feature branch before anyone is resumed. Agents cite these decisions instead of asking again.
+
+To deliver the scope, the main session dispatches `engineering-manager` with the spec path, the scope, and the plan path. When the report says `BLOCKED`, it relays the escalation to the human, records the answer in the plan's `## Decisions`, and re-dispatches the manager with it. A question about design goes to `architect` first (see Triage). The main session does not run the phases itself.
 
 The main session owns each plan doc's status line and keeps it current: `building (<branch>)` when the manager is dispatched, `blocked (<question>)` when it reports `BLOCKED`, back to `building` on resume, and `done (PR #<n>)` when the human merges the PR.
 
-The main session also records the report's `Findings` in `docs/code-reviews/` with the `review-tracker` skill: one session file per feature run, updated in place when the manager is resumed. A finding is marked `fixed`, with its commit sha in the resolution notes, when the batch that fixes it lands.
+The main session also records the report's `Findings`, and the reviewer's, in `docs/code-reviews/` with the `review-tracker` skill: one session file per feature run, updated in place when the manager is resumed. A finding is marked `fixed`, with its commit sha in the resolution notes, when the batch that fixes it lands.
+
+### Verify a `DONE` report
+
+The manager's report is a claim. Before treating it as done, the main session checks it:
+
+1. `./scripts/check` passes.
+2. The Project profile's criterion grep finds a tagged test for every ID under `Criteria covered`, and the scope has no other IDs left.
+3. `git log` on the branch shows, for each batch in the report, a `test(red)` checkpoint before its `feat(green)` checkpoint.
+4. HEAD matches the report.
+
+If anything doesn't match, resume the manager with the discrepancy. Never present an unverified report to the human as done.
+
+### Review before the PR
+
+After a verified `DONE`, dispatch `reviewer` on the branch's diff against `main`, with the spec and plan paths. The reviewer returns findings without writing them; record them with the `review-tracker` skill, mapping its severities as `reviewer.md` says.
+
+- Triage each Blocker and Major against the threat model, as for sweep findings. Send the ones that stand back to the manager as targets for a new batch, with their finding IDs.
+- After that run is verified, dispatch the reviewer again on the new commits only. If a Blocker remains, escalate to the human.
+- Minors and Nits are recorded and listed in the PR description; they don't block it.
+
+### The coordinator
 
 The `engineering-manager` is the coordinator. Throughout this loop, "you" means the coordinator. You do not write or edit files in the `src` or `test` lane yourself. You plan batches, dispatch subagents, verify their work, and commit checkpoints. The subagents work as a triad, one at a time:
 
@@ -68,9 +91,10 @@ Dispatch `app-developer` in scaffold mode with the signatures the spec declares.
 
 ### 2. RED
 
-Dispatch `test-engineer` with the spec path, the criterion IDs for this batch, and the mode (`conformance` or `adversarial`). Verify:
+Dispatch `test-engineer` with the spec path, the criterion IDs for this batch, the exact criterion text quoted in the plan, any `## Decisions` that bear on them, and the mode (`conformance` or `adversarial`). Verify:
 
 - Diff check passes.
+- Each test's assertion checks the behavior its quoted criterion states, not a narrower or different reading. Send back any that doesn't.
 - Run the new tests with `./scripts/test <paths>`. Every new test meets the test rules in AGENTS.md: outcome **failed**, not **error** (see the Project profile), for a valid reason. Send invalid tests back.
 - `./scripts/lint` passes on the new test code.
 - Pins are the one exception to "every new test fails." A pin passes at RED by design because it guards GREEN against over-rejection: an accepted boundary value, or an input that must stay unchanged. The test-engineer labels each pin and names what it guards. Check that each one really is an accept-side guard, and send back any that isn't.
@@ -99,7 +123,8 @@ Commit: `refactor: <summary>` (skip the commit if nothing changed, but the repor
 
 ## Triage (before a finding or question becomes work)
 
-- **Spec questions.** When a subagent raises one, first check the spec, the checkpoint docs, and the rulings already recorded. If their text settles it, re-dispatch the subagent with that text quoted. That is citing, not resolving. Escalate only what the text leaves open.
+- **Spec questions.** When a subagent raises one, first check the spec and the `## Decisions` sections of the plans in `docs/plans/`. If their text settles it, re-dispatch the subagent with that text quoted. That is citing, not resolving. Escalate only what the text leaves open.
+- **Design questions.** A question about structure (module boundaries, a pattern, a new abstraction, a dependency choice), as opposed to what the spec requires, goes to `architect` before the human. Dispatch it with the question and the code it touches, then present its recommendation along with the question. The human decides. An accepted recommendation becomes an ADR in `docs/adr/`, and the decision is recorded in the plan.
 - **Adversarial findings.** Before a sweep finding becomes a RED target, judge it against the threat model in the Project profile, using the test-engineer's "Realistic?" answer. A finding no real caller or upstream system could produce is not pursued: report it as `info` with disposition `triaged out` and the reason, so the human sees every one.
 
 ## Batch scaling

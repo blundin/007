@@ -15,11 +15,11 @@ It works with any language. Each project fills in three scripts and a short prof
       │     ├── app-developer  GREEN: minimum code       (src lane)
       │     └── refactorer     REFACTOR: structure only  (src lane)
       │
-      │   outside the loop, dispatched on request:
-      ├── architect            weighs options, records ADRs in docs/adr/
-      └── reviewer             independent review; records findings
+      │   outside the batch loop:
+      ├── architect            weighs design questions, records ADRs in docs/adr/
+      └── reviewer             independent review before each PR
 
-Every batch goes RED, GREEN, REFACTOR, with a checkpoint commit after each phase and a diff check after every dispatch. The rules are in `CLAUDE.md` (the loop) and `AGENTS.md` (rules for every contributor, plus the Project profile). Review findings are kept in `docs/code-reviews/` by the bundled `review-tracker` skill.
+Every batch goes RED, GREEN, REFACTOR, with a checkpoint commit after each phase and a diff check after every dispatch. When the engineering manager reports done, the main session verifies the report against the tests and git history, then has the reviewer check the whole branch before it goes to you as a PR. The human's answers are recorded in each plan's `## Decisions`, so no agent asks twice. The rules are in `CLAUDE.md` (the loop) and `AGENTS.md` (rules for every contributor, plus the Project profile). Review findings are kept in `docs/code-reviews/` by the bundled `review-tracker` skill.
 
 ## Requirements
 

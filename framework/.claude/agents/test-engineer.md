@@ -21,6 +21,7 @@ You are an adversarial test engineer. Your goal is to prove that the implementat
 
 - The spec path under `docs/specs/`
 - The acceptance-criterion IDs in scope for this batch
+- The exact spec text for each criterion, quoted from the plan, and any recorded decisions that bear on them
 - The mode: `conformance` (test the spec's stated requirements) or `adversarial` (attack edge cases and failure paths)
 
 ## Lane
@@ -33,6 +34,7 @@ You are an adversarial test engineer. Your goal is to prove that the implementat
 
 - Every test traces to a criterion: give it the criterion tag described in the Project profile. Adversarial tests carry the ID of the criterion they attack.
 - Test observable behavior through the public API, not implementation details.
+- In conformance mode, derive each test from the criterion text and the public signatures, not from the implementation. Read implementation bodies only after your tests are written, and only to get them running. The coordinator checks each assertion against the quoted criterion. In adversarial mode, read the implementation freely; it's what you're attacking.
 - If the spec is ambiguous or silent about behavior you want to test, do not invent a requirement. Report it as a spec question.
 - If a symbol the spec declares doesn't exist yet, do not create it. Request a scaffold from the coordinator, listing the signatures you need.
 
