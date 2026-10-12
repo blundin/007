@@ -7,7 +7,7 @@ Changes to `framework/` that an adopter would notice. Versions are git tags; `gi
 - Added the `architect` agent. It recommends one option and records ADRs in `docs/adr/`. The new `adr_write_guard.py` hook limits it to Markdown files there.
 - Added the `reviewer` agent, an independent code reviewer that records findings through the `review-tracker` skill.
 - Neither agent is part of the loop in `CLAUDE.md`; the main session or the human dispatches them.
-- Added `docs/adr/README.md`.
+- Added `docs/adr/README.md`, and listed `docs/adr/` in the `AGENTS.md` Layout.
 - Unwrapped the Markdown files so each paragraph and list item is one line. The wording is unchanged.
 - Added `bin/007 remove`. It deletes the framework files that still match the commit in `.007-version` and lists the ones you've changed.
 - `bin/007 new` and `init` now refuse to copy while `framework/` has uncommitted changes, so `.007-version` always matches what was copied.

@@ -12,6 +12,7 @@ These rules apply to every contributor, human or agent, whatever tool you use.
 - Fixtures: the fixture path in the Project profile below
 - Specs: `docs/specs/`
 - Plans: `docs/plans/`
+- Decision records: `docs/adr/` (written by the `architect` agent)
 - Review findings: `docs/code-reviews/` (a session file per review; `known-issues.json` lists what is still open)
 
 ## Setup and checks
