@@ -4,6 +4,8 @@ Changes to `framework/` and `bin/007` that an adopter would notice. Versions are
 
 ## Unreleased
 
+- `./scripts/check-dev-framework` passes in a project whose Project profile is filled. `test_setup_skill.py` required every profile line to keep its `<!-- FILL` marker, so it failed after `/007-setup` ran; it now checks only the lines still unfilled.
+
 ## v1.0.0 (2026-10-12)
 
 The baseline release. Earlier history was folded into this one commit, so `.007-version` files from before it no longer resolve: reinstall those projects from v1.0.0.
