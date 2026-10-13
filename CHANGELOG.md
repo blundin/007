@@ -4,6 +4,8 @@ Changes to `framework/` and `bin/007` that an adopter would notice. Versions are
 
 ## Unreleased
 
+- `lanes.json` entries can name a single file: an entry that doesn't end in `/` allows exactly that path, such as `config/routes.rb`, without opening its directory. Entries that are absolute or contain `..` now make the file invalid, which blocks every write, instead of silently matching nothing. An entry like `"lib"`, which used to be invalid, now names a file, so writes under `lib/` stay blocked.
+
 ## v1.0.0 (2026-10-12)
 
 The baseline release. Earlier history was folded into this one commit, so `.007-version` files from before it no longer resolve: reinstall those projects from v1.0.0.

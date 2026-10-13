@@ -94,7 +94,10 @@ def test_blocks_every_write_when_lanes_json_is_missing(tmp_path: Path) -> None:
         '{"src": "lib/"}',
         '{"src": []}',
         '{"src": [""]}',
-        '{"src": ["lib"]}',
+        '{"src": ["/lib/"]}',
+        '{"src": ["/config/routes.rb"]}',
+        '{"src": ["lib/../spec/"]}',
+        '{"src": ["../config/routes.rb"]}',
         '{"src": [3]}',
     ],
 )
@@ -107,6 +110,49 @@ def test_blocks_every_write_when_lanes_json_is_invalid(
 
     assert result.returncode == 2
     assert "lanes.json" in result.stderr
+
+
+EXACT_LANES = {"src": ["app/", "config/routes.rb"]}
+
+
+def test_allows_write_to_a_file_the_lane_names_exactly(tmp_path: Path) -> None:
+    write_lanes(tmp_path, json.dumps(EXACT_LANES))
+
+    result = run_guard(tmp_path, "src", str(tmp_path / "config" / "routes.rb"))
+
+    assert result.returncode == 0, result.stderr
+
+
+@pytest.mark.parametrize(
+    "file_path",
+    [
+        "config/routes.rb.bak",
+        "config/routes.rbx",
+        "config/routes.rb/x.rb",
+        "config/routes/items.rb",
+        "config/application.rb",
+    ],
+)
+def test_an_exact_file_entry_matches_only_that_file(
+    tmp_path: Path, file_path: str
+) -> None:
+    write_lanes(tmp_path, json.dumps(EXACT_LANES))
+
+    result = run_guard(tmp_path, "src", str(tmp_path / file_path))
+
+    assert result.returncode == 2
+    assert "active TDD lane is 'src'" in result.stderr
+
+
+def test_an_entry_without_a_slash_is_a_file_not_a_directory(
+    tmp_path: Path,
+) -> None:
+    write_lanes(tmp_path, json.dumps({"src": ["lib"]}))
+
+    result = run_guard(tmp_path, "src", str(tmp_path / "lib" / "x.rb"))
+
+    assert result.returncode == 2
+    assert "active TDD lane is 'src'" in result.stderr
 
 
 def test_blocks_write_outside_the_project(tmp_path: Path) -> None:
