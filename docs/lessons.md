@@ -8,13 +8,13 @@ The lessons below come from the framework's first project. Their sources name fi
 
 When a sweep reopens an area that was already patched, decide among four options before writing the next RED batch: build from an allowlist, delegate to a library, narrow the requirement, or accept the risk. Hand-rolled denylist scrubbing of `Location` cost two batches before it was replaced with building from httpx's parsed URL.
 
-Source: `docs/checkpoint-client-core.md`, Lessons. Led to: FW-05.
+Source: `docs/checkpoint-client-core.md`, Lessons.
 
 ## Probe prompts must forbid rewriting the command
 
 In the FW-01 hook probe, the test-engineer ran `git -C <path> tag` instead of the `git tag` it was given, which tested a different code path in the hook. Probe prompts should say to run the command exactly as written, with no `-C` and no `cd`.
 
-Source: FW-01 hook probe, 2026-10-02. Led to: FW-09.
+Source: FW-01 hook probe, 2026-10-02.
 
 ## Read the deployed source before theorizing
 

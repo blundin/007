@@ -4,6 +4,8 @@ Changes to `framework/` and `bin/007` that an adopter would notice. Versions are
 
 ## Unreleased
 
+- `CLAUDE.md` says the `git reset` that splits a struggling batch raises a permission prompt on purpose, since it discards commits.
+- `./scripts/check-dev-framework` passes in a project whose Project profile is filled. `test_setup_skill.py` required every profile line to keep its `<!-- FILL` marker, so it failed after `/007-setup` ran; it now checks only the lines still unfilled.
 - `lanes.json` entries can name a single file: an entry that doesn't end in `/` allows exactly that path, such as `config/routes.rb`, without opening its directory. Entries that are absolute or contain `..` now make the file invalid, which blocks every write, instead of silently matching nothing. An entry like `"lib"`, which used to be invalid, now names a file, so writes under `lib/` stay blocked.
 
 ## v1.0.0 (2026-10-12)

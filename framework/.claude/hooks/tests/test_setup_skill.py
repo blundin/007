@@ -52,11 +52,14 @@ def test_every_reference_section_gives_an_example_for_each_stack(item: str) -> N
         assert f"*{stack}:*" in section, stack
 
 
-@pytest.mark.parametrize("line", profile_lines())
-def test_profile_fill_comments_point_to_the_skill_without_examples(
+# Filled lines are the project's own; tests/test_framework.py, which doesn't
+# ship, checks that the framework leaves every line unfilled.
+@pytest.mark.parametrize(
+    "line", [line for line in profile_lines() if "<!-- FILL" in line]
+)
+def test_unfilled_profile_lines_point_to_the_skill_without_examples(
     line: str,
 ) -> None:
-    assert "<!-- FILL" in line
     assert "/007-setup" in line
     assert "Example" not in line
 

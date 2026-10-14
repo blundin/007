@@ -171,9 +171,9 @@
       "title": "Lessons cite backlog items that don't exist",
       "description": "FW-05 and FW-09 are named as 'Led to', but neither is in docs/backlog.md (they're from the first project).",
       "suggestion": "Note they're the first project's IDs, or record them under Done.",
-      "status": "open",
-      "resolved_at": null,
-      "resolution_notes": null
+      "status": "fixed",
+      "resolved_at": "2026-10-12T22:30:46Z",
+      "resolution_notes": "Removed the 'Led to: FW-05' and 'Led to: FW-09' references from docs/lessons.md. Branch docs/audit-followups."
     },
     {
       "id": "20261012192429-014",
@@ -184,9 +184,9 @@
       "title": "007 has no CI",
       "description": "The gate runs only locally; nothing checks PRs. The README tells adopters CI should run their gate.",
       "suggestion": "Add a minimal GitHub Actions job running ./scripts/check (CI change: needs approval).",
-      "status": "open",
-      "resolved_at": null,
-      "resolution_notes": null
+      "status": "wont-fix",
+      "resolved_at": "2026-10-12T23:48:18Z",
+      "resolution_notes": "Skipped for now: one maintainer runs ./scripts/check before every merge. Revisit when someone else contributes."
     },
     {
       "id": "20261012192429-015",
@@ -197,9 +197,9 @@
       "title": "Batch splitting will prompt mid-run",
       "description": "Split on struggle resets the branch, and git reset is on the ask list, so an unattended run stops for a prompt there.",
       "suggestion": "Decide whether that's intended; if so, say so in CLAUDE.md's batch scaling.",
-      "status": "open",
-      "resolved_at": null,
-      "resolution_notes": null
+      "status": "fixed",
+      "resolved_at": "2026-10-12T22:30:46Z",
+      "resolution_notes": "Kept the prompt; CLAUDE.md's Split on struggle now says the reset prompt is deliberate. Branch docs/audit-followups."
     }
   ]
 }
