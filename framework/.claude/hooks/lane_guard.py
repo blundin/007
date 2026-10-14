@@ -3,7 +3,9 @@
 
 Each loop subagent declares this hook in its frontmatter and passes its lane,
 `test` or `src`, as the first argument. The paths each lane allows come from
-`.claude/lanes.json`, a map of lane name to path prefixes that end in `/`.
+`.claude/lanes.json`, a map of lane name to a list of entries. An entry that
+ends in `/` allows everything under that directory; any other entry allows
+exactly that one file. Entries are relative to the project, with no `..`.
 A missing or invalid lanes file, an unknown lane, or hook input that cannot be
 read blocks every write.
 
@@ -31,10 +33,22 @@ def load_lanes(project_dir: Path) -> dict[str, tuple[str, ...]] | None:
     for name, prefixes in raw.items():
         if not isinstance(prefixes, list) or not prefixes:
             return None
-        if not all(isinstance(p, str) and p.endswith("/") for p in prefixes):
+        if not all(valid_entry(p) for p in prefixes):
             return None
         lanes[name] = tuple(prefixes)
     return lanes
+
+
+def valid_entry(entry: object) -> bool:
+    if not isinstance(entry, str) or not entry or entry.startswith("/"):
+        return False
+    return ".." not in entry.split("/")
+
+
+def in_lane(relative: str, entries: tuple[str, ...]) -> bool:
+    return any(
+        relative.startswith(e) if e.endswith("/") else relative == e for e in entries
+    )
 
 
 def deny(message: str) -> int:
@@ -62,7 +76,7 @@ def main() -> int:
     if lanes is None:
         print(
             f"Blocked: {LANES_FILE} is missing or invalid. It must map each lane "
-            'to a list of path prefixes ending in "/".',
+            'to a list of relative paths: directories ending in "/", or files.',
             file=sys.stderr,
         )
         return 2
@@ -84,10 +98,10 @@ def main() -> int:
         print(f"Blocked: {target} is outside the project.", file=sys.stderr)
         return 2
 
-    if not relative.startswith(allowed):
+    if not in_lane(relative, allowed):
         print(
             f"Blocked: the active TDD lane is '{lane}', which allows writes only "
-            f"under {', '.join(allowed)}. You attempted to write {relative}. "
+            f"to {', '.join(allowed)}. You attempted to write {relative}. "
             "Stay in your lane and report to the coordinator if you need "
             "changes elsewhere.",
             file=sys.stderr,

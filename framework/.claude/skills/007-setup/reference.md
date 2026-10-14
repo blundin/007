@@ -140,10 +140,10 @@ One section per item: what it controls, how to find it, and an example for each 
 
 **Controls:** where each triad agent may write. The test engineer writes only in `test`; the app developer and the refactorer only in `src`.
 
-**How to find it:** where tests and code live. Every prefix ends in `/`. Leave configuration, migrations, CI, and dependency manifests out of both lanes, so a change to them stops the loop for the human.
+**How to find it:** where tests and code live. An entry ending in `/` allows a whole directory; any other entry allows exactly one file, for a file the code needs whose directory must stay out, such as a Rails app's `config/routes.rb`. Paths are relative to the repo root, with no `..`. Leave configuration, migrations, CI, and dependency manifests out of both lanes, so a change to them stops the loop for the human.
 
 - *Python library:* `{"test": ["tests/"], "src": ["src/"]}`
-- *Rails app:* `{"test": ["test/"], "src": ["app/", "lib/"]}`, or `spec/` for RSpec. `db/`, `config/`, and `bin/` stay out.
+- *Rails app:* `{"test": ["test/"], "src": ["app/", "lib/"]}`, or `spec/` for RSpec. Add `"config/routes.rb"` to `src` if batches add routes. The rest of `db/`, `config/`, and `bin/` stays out.
 - *Swift app:* `{"test": ["Tests/"], "src": ["Sources/"]}`. An Xcode project might use `{"test": ["MyAppTests/"], "src": ["MyApp/"]}`.
 
 ### scripts/check
