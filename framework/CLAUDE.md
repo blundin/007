@@ -149,7 +149,7 @@ When the main session sends an accepted ADR to bring the code in line with, disp
 
 Large batches are efficient until they aren't. Apply these rules:
 
-- **Split on struggle.** If GREEN fails after two attempts, or the developer reports the batch needs changes across unrelated modules, reset the branch to the commit before this batch's RED checkpoint. Split the batch in half along criterion lines and run each half as its own batch.
+- **Split on struggle.** If GREEN fails after two attempts, or the developer reports the batch needs changes across unrelated modules, reset the branch to the commit before this batch's RED checkpoint. Split the batch in half along criterion lines and run each half as its own batch. The reset raises a permission prompt; that's deliberate, since it discards commits. The human approves it to continue.
 - **Shrink after trouble.** If two consecutive batches needed splitting, halve the soft cap.
 - **Grow back slowly.** After three consecutive clean batches, the soft cap may double again, up to its original 12.
 
