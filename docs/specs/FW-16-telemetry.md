@@ -59,7 +59,7 @@ Each metric names the decision it informs and where its data comes from. *Git* m
 
 - **SETUP-08**: `/007-setup`'s drift check reports when `.claude/settings.json` doesn't register the telemetry hook, and shows the entries to merge. It also says whether recording is on, and how to turn it on, but never turns it on itself. The human decides; an adopter who opts out by leaving the hooks out isn't nagged twice in one run.
 - **INIT-01**: When `007 new` or `007 init` skips an existing `.claude/settings.json`, it prints the framework's `hooks` block as JSON ready to paste, and the `settings.local.json` lines that turn recording on. The next-steps text says recording stays off until those lines are added. FW-11's BOTH-02 is updated to match.
-- **WIRE-01**: `test_agent_wiring.py`, or a new test beside it, checks that the framework's own `settings.json` registers `telemetry.py` on the four events in EVENT-02.
+- **WIRE-01**: `test_agent_wiring.py`, or a new test beside it, checks that the framework's own `settings.json` registers `telemetry.py` on the six events in EVENT-02.
 
 ### Removal
 
