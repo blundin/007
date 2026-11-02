@@ -37,6 +37,7 @@ Each metric names the decision it informs and where its data comes from. *Git* m
 - **STATS-03**: The reader identifies scopes from plan files and their branches, and batches from checkpoint commit prefixes (`test(red)`, `feat(green)`, `refactor`, `chore(scaffold)`, `test: pin`).
 - **STATS-04**: `bin/007 stats <dir>...` runs the reader from the clone against each named project and adds a cross-project summary. A project installed from an older release, or one without the framework installed, is still read, so the newest reader covers every project.
 - **STATS-05**: The reader writes nothing, runs no git command that changes state, and uses no network.
+- **STATS-06**: The `007-setup` reference gets a "Reading the report" section. For each symptom the report can show, it gives the likely cause and the change that addresses it: a Project profile item, a `lanes.json` entry, a script, or the spec. It marks the symptoms that belong to the framework rather than the project (refactor passes that change nothing, token cost by agent) and says to send the report's `--json` output to the 007 repo for those. The reader flags any metric past its threshold and names that symptom's entry. The thresholds are named constants in the reader. A test checks that every flag the reader can raise has an entry in the section, so a new flag can't ship without guidance.
 
 ### Event log
 
@@ -74,7 +75,7 @@ Trusted developers on their own repos. The risks are leaking content into a file
 Test-first, by the main session with Brian, in this order. Each step is its own PR, and `./scripts/check` passes at every step.
 
 1. **This spec and ADR-002.** The ADR records: local only, with no collector; `.007/` as the log location; the self-ignoring directory; the event schema and its version field; transcripts over OpenTelemetry for per-agent cost, because OpenTelemetry labels every custom agent `custom`; and why the guards log their own denials.
-2. **Reader over git and docs (STATS-01 to STATS-05).** Fixture repos built in `tmp_path` by the tests. No hook changes, so it can land and be used on existing projects at once.
+2. **Reader over git and docs (STATS-01 to STATS-06).** Fixture repos built in `tmp_path` by the tests. No hook changes, so it can land and be used on existing projects at once.
 3. **Event log (EVENT-01, -02, -05 to -08, MAIN-01, WIRE-01).** Touches `settings.json`, so it needs Brian's explicit approval of the diff. First confirm two behaviors on the current Claude Code release and note the version in the ADR: that a hook process sees variables set in `settings.local.json`'s `env` block, and that Stop and UserPromptSubmit inputs carry `transcript_path` and `session_id` as documented.
 4. **Guard denials (EVENT-04).** Touches the guards, which also needs Brian's approval. The guards' existing tests must pass unchanged, plus new tests that a logging failure leaves the exit code alone.
 5. **Token capture (EVENT-03).** Synthetic transcript fixtures shaped like the current format (assistant records with `message.model` and `message.usage`). Before writing them, confirm the shape against a real subagent transcript and note the Claude Code version in the ADR.
