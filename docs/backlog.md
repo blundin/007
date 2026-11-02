@@ -6,6 +6,10 @@ IDs continue from the project where the framework was first built, so lessons an
 
 ## Todo
 
+### FW-16 Local telemetry
+
+Status: `todo`. Record how the loop runs in each project, on the developer's machine only: a reader over git, the reflog, plans, and review findings, plus a fail-open hook that logs subagent runs, guard denials, check runs, and tokens by agent. Supplies FW-10's counts and the numbers FW-14 4a and 4c need. Includes the path for moving v1.0.0 projects over. Spec in [`specs/FW-16-telemetry.md`](specs/FW-16-telemetry.md).
+
 ### FW-10 Retrospective after each feature
 
 A fixed step in the done criteria, not a Claude Code hook. After the manager reports `DONE`, the main session reviews the manager's report, the branch's commit history, and the checkpoint doc.
